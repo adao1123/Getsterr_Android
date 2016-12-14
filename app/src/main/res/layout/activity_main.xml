@@ -101,7 +101,7 @@
             android:layout_height="80dp"
             android:backgroundTint="@color/facebook"
             android:background="@drawable/roundcorner"
-            android:src="@drawable/ic_facebook_f" />
+            android:src="@drawable/ic_facebook" />
 
         <Space
             android:layout_width="0dp"

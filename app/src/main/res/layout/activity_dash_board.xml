@@ -52,14 +52,33 @@
             android:layout_weight="1" >
         </Space>
 
-        <ImageButton
-            android:id="@+id/dash_facebook_button"
+        <!--<ImageButton-->
+            <!--android:id="@+id/dash_facebook_button"-->
+            <!--android:layout_width="30dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:backgroundTint="@color/facebook"-->
+            <!--android:background="@drawable/roundcorner"-->
+            <!--android:src="@drawable/ic_facebook_f"-->
+            <!--android:visibility="gone"/>-->
+        <FrameLayout
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:backgroundTint="@color/facebook"
+            android:layout_margin="5dp"
             android:background="@drawable/roundcorner"
-            android:src="@drawable/ic_facebook_f"
-            android:visibility="gone"/>
+            android:backgroundTint="@color/facebook"
+            android:layout_alignParentRight="true"
+            android:id="@+id/dash_facebook_button">
+            <ImageButton
+                android:id="@+id/dash_social_facebook_button"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/facebook"
+                android:adjustViewBounds="true"
+                android:src="@drawable/ic_facebook"
+                android:padding="10dp"
+                />
+        </FrameLayout>
 
         <Space
             android:layout_width="0dp"

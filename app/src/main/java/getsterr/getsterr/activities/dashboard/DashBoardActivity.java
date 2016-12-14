@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -90,8 +91,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     RecyclerView dashBoardRecyclerView;
 
-    ImageButton facebookButton, twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton;
-
+    ImageButton  twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton;
+    FrameLayout facebookButton;
     Toolbar dashBoardToolbar;
     ActionBar dashBoardActionBar;
     Map<String,Boolean> checkedMap;
@@ -160,7 +161,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     private void initViews(){
         dashBoardRecyclerView = (RecyclerView)findViewById(R.id.dashbard_recyclerView);
         dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
-        facebookButton = (ImageButton)findViewById(R.id.dash_facebook_button);
+        facebookButton = (FrameLayout)findViewById(R.id.dash_facebook_button);
         twitterButton = (ImageButton)findViewById(R.id.dash_twitter_button);
         pinterestButton = (ImageButton)findViewById(R.id.dash_pinterest_button);
         linkedinButton = (ImageButton)findViewById(R.id.dash_linkedin_button);

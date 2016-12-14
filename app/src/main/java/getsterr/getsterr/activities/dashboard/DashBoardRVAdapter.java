@@ -127,7 +127,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 viewHolder = new YoutubeSearchViewHolder(view4);
                 break;
             case INSTAGRAM_MEDIA_CARD:
-                View view5 = inflater.inflate(R.layout.rv_item_social_facebook, parent, false);
+                View view5 = inflater.inflate(R.layout.rv_item_social_twitter, parent, false);
                 viewHolder = new InstagramViewHolder(view5);
                 break;
             case TWITTER_MEDIA_CARD:
@@ -234,8 +234,9 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     private void configurePinterestViewHolder(PinterestViewHolder pinterestViewHolder, int position){
         PDKPin pin = (PDKPin)cardItems.get(position);
-        if (pin.getBoard()!=null)pinterestViewHolder.postedByTv.setText(pin.getBoard().getName()+" pinned:");
-        else pinterestViewHolder.postedByTv.setVisibility(View.GONE);
+//        if (pin.getBoard()!=null)pinterestViewHolder.postedByTv.setText(pin.getBoard().getName()+" pinned:");
+//        else pinterestViewHolder.postedByTv.setVisibility(View.GONE);
+        pinterestViewHolder.postedByTv.setText("New Pin: ");
 //        if (pin.getUser()!=null)pinterestViewHolder.postedByTv.setText(pin.getUser().getFirstName()+" "+pin.getUser().getLastName()+" pinned:");
         pinterestViewHolder.pinterestInfoTextView.setText(pin.getNote());
         Picasso.with(context).load(pin.getImageUrl()).into(pinterestViewHolder.pinterestImageView);
@@ -246,7 +247,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         pinterestViewHolder.pinterestImageButton.setBackgroundResource(R.drawable.roundcorner);
 
         pinterestViewHolder.pinterestTimeTextView.setText(getTimeDiffPinterest(pin.getCreatedAt().toString()));
-        Log.i(TAG, "configurePinterestViewHolder: link "+pin.getLink());
+        Log.i(TAG, "configurePinterestViewHolder: url link "+pin.getLink());
         pinterestViewHolder.bindPinterestCardClick(cardClickListener, pin.getLink());
     }
 
@@ -259,7 +260,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         InstagramData instagramData = (InstagramData) cardItems.get(position);
 
         if (instagramData.getCaption()!=null)instagramViewHolder.instagramInfoTextView.setText(instagramData.getCaption().getText());
-
+        instagramViewHolder.postedByTv.setText(instagramData.getUser().getUsername()+" posted:");
         // Once resource for ImageButton is changed, rounded corner disappears
         instagramViewHolder.instagramImageButton.setImageResource(R.drawable.ic_instagram);
         instagramViewHolder.circleFrame.getBackground().setColorFilter(instagramViewHolder.color, PorterDuff.Mode.SRC_ATOP);
@@ -378,6 +379,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ImageButton instagramImageButton;
         ImageView instagramImageView;
         FrameLayout circleFrame;
+        TextView postedByTv;
         TextView instagramTimeTextView;
         int color;
 
@@ -385,6 +387,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             super(itemView);
             instagramCardView = (CardView)itemView.findViewById(R.id.dashboard_social_media_cardView);
             instagramInfoTextView = (TextView)itemView.findViewById(R.id.dash_social_media_info_textView);
+            postedByTv = (TextView)itemView.findViewById(R.id.dash_social_media_postedby);
             instagramImageButton = (ImageButton)itemView.findViewById(R.id.dash_social_media_imageButton);
             circleFrame = (FrameLayout)itemView.findViewById(R.id.dash_social_media_circle);
             instagramTimeTextView = (TextView)itemView.findViewById(R.id.dash_social_media_time_textView);
