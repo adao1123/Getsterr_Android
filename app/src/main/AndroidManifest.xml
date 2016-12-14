@@ -19,16 +19,15 @@
             android:name="io.fabric.ApiKey"
             android:value="439e0dcc6a94e115377d50f92f49f152dec0c9cc" />
 
-        <activity android:name=".activities.main.MainActivity" android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".activities.main.MainActivity"
+            android:screenOrientation="portrait">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.dashboard.DashBoardActivity"
-            android:windowSoftInputMode="stateHidden" android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".utilities.WebViewActivity" />
         <activity android:name=".activities.login.LoginActivity">
             <intent-filter>
@@ -36,6 +35,7 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="pdk4872228761168263050" />
             </intent-filter>
         </activity>
@@ -55,8 +55,16 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.youtube.YoutubeDisplayActivity"
-            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".activities.youtube.YoutubeDisplayActivity"
+            android:screenOrientation="landscape" />
+        <activity android:name=".activities.splash.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
