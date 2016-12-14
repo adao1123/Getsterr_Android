@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--color name="colorPrimary">#FF0000</color-->
+    <color name="colorPrimary">#D32F2F</color>
+    <color name="colorPrimaryDark">#D32F2F</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="colorAccentLight">#DCDCDC</color>
+    <color name="colorAccentDark">#9E9E9E</color>
+    <color name="colorDividerColor">#BDBDBD</color>
+
+    <color name="twitter">#00BCD4</color>
+    <color name="linkedin">#2196F3</color>
+    <color name="facebook">#303F9F</color>
+    <color name="youtube">#F44336</color>
+    <color name="pinterest">#D32F2f</color>
+    <color name="instagram">#512DA8</color>
+
+    <color name="white">#FFFFFF</color>
+
+
+</resources>
+

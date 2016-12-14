@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_youtube_display"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:background="@color/colorPrimary"
+    android:paddingRight="20dp"
+    tools:context="getsterr.getsterr.activities.youtube.YoutubeDisplayActivity">
+    <com.google.android.youtube.player.YouTubePlayerView
+        android:id="@+id/youtube_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <Button
+        android:id="@+id/youtube_share_button"
+        android:background="@drawable/rounded_button"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_below="@+id/youtube_view"
+        android:backgroundTint="@color/colorPrimary"
+        android:text="Share"/>
+</RelativeLayout>

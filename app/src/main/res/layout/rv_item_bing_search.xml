@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_marginRight="2dp"
+    android:layout_marginLeft="2dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
+    card_view:cardCornerRadius="1dp"
+    card_view:cardElevation="2dp"
+    android:clickable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:id="@+id/dashboard_bing_result_cardView">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/dash_bing_result_title_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:layout_alignParentLeft="true"
+            android:textStyle="bold"
+            android:text="Search Result title"/>
+
+        <TextView
+            android:id="@+id/dash_bing_result_time_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_alignParentRight="true"
+            />
+
+        <TextView
+            android:id="@+id/dash_bing_result_snippet_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:layout_below="@id/dash_bing_result_title_textView"
+            android:text="Search Snippet - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+            />
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>
