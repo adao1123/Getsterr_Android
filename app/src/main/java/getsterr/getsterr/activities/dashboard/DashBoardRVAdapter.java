@@ -194,12 +194,12 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void configureBingResultViewHolder(BingResultViewHolder bingResultViewHolder, int position){
         //BingResultCard bingResultCard = (BingResultCard) cardItems.get(position);
         Value value = (Value)cardItems.get(position);
-
         bingResultViewHolder.bingResultTitleTextView.setText(value.getName());
 //        bingResultViewHolder.bingResultTimeTextView.setText(value.getDateLastCrawled());
         bingResultViewHolder.bingResultSnippetTextView.setText(value.getSnippet());
-
-        bingResultViewHolder.bindBingResultCardClick(cardClickListener, value.getDisplayUrl());
+        Log.i(TAG, "configureBingResultViewHolder: url - " + value.getUrl());
+        Log.i(TAG, "configureBingResultViewHolder: display url - " + value.getDisplayUrl());
+        bingResultViewHolder.bindBingResultCardClick(cardClickListener, value.getUrl());
     }
 
     /**
