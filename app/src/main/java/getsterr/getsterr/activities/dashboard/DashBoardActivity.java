@@ -105,6 +105,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     private PDKResponse myPinsResponse;
     private boolean loading = false;
     private static final String PIN_FIELDS = "id,link,creator,image,counts,note,created_at,board,metadata";
+    private static final String FB_PERMISSIONS = "id,name,link,icon,message,created_time,description,picture,story,permalink_url,from, full_picture";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,8 +146,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onCardClick(String cardUrl) {
         Intent intent = new Intent(DashBoardActivity.this, WebViewActivity.class);
-        Log.d(TAG, "onCardClick: "+cardUrl);
-        //TODO some urls don't load
         intent.putExtra(Constants.URL_INTENTKEY, cardUrl);
         startActivity(intent);
     }
@@ -209,27 +208,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         if (checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY)) handleLinkedInApi();
         if (checkedMap.get(Constants.PINTEREST_CHECK_INTENTKEY)) handlePinterestApi();
         if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY)) handleTwitterApi();
-//        for (String filter : checkedMap.keySet()){
-//            if (checkedMap.get(filter)){
-//                switch (filter){
-//                    case Constants.INSTAGRAM_CHECK_INTENTKEY:
-//                        handleInstagramApi();
-//                        break;
-//                    case Constants.FACEBOOK_CHECK_INTENTKEY:
-//                        handleFacebookApi();
-//                        break;
-//                    case Constants.LINKEDIN_CHECK_INTENTKEY:
-//                        handleLinkedInApi();
-//                        break;
-//                    case Constants.PINTEREST_CHECK_INTENTKEY:
-//                        handlePinterestApi();
-//                        break;
-//                    case Constants.TWITTER_CHECK_INTENTKEY:
-//                        handleTwitterApi();
-//                        break;
-//                }
-//            }
-//        }
     }
 
     private List<Object> combineNewsFeedLists(){
@@ -259,27 +237,27 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      *
      */
     private void setSearchEditTextListener(){
-        dashSearchEditText.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_LEFT = 0;
-                final int DRAWABLE_TOP = 1;
-                final int DRAWABLE_RIGHT = 2;
-                final int DRAWABLE_BOTTOM = 3;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (dashSearchEditText.getRight() - dashSearchEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        Log.d(TAG, "onTouch: SEARCH BUTTON CLIKED");
-                        makeBingApiCall(dashSearchEditText.getText().toString());
-//                        makeYoutubeApiCall(dashSearchEditText.getText().toString());
-
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+//        dashSearchEditText.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                final int DRAWABLE_LEFT = 0;
+//                final int DRAWABLE_TOP = 1;
+//                final int DRAWABLE_RIGHT = 2;
+//                final int DRAWABLE_BOTTOM = 3;
+//
+//                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
+//                    if(motionEvent.getRawX() >= (dashSearchEditText.getRight() - dashSearchEditText.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+//                        // your action here
+//                        Log.d(TAG, "onTouch: SEARCH BUTTON CLIKED");
+//                        makeBingApiCall(dashSearchEditText.getText().toString());
+////                        makeYoutubeApiCall(dashSearchEditText.getText().toString());
+//
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
         dashSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -360,7 +338,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         Log.d(TAG, "onNext: " + bingResults.toString());
                         Log.d(TAG, "onNext: " + bingResults.getWebPages().getWebSearchUrl());
 
-
                         ArrayList<Object> items = new ArrayList<Object>();
                         for(Value val: bingResults.getWebPages().getValue()){
                             items.add(val);
@@ -378,50 +355,36 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     }
 
     /**
-     * Check if facebook is logged in
-     * @return
-     */
-    public boolean isFacebookLoggedIn(){
-        Log.d(TAG, "isFacebookLoggedIn: ");
-        return AccessToken.getCurrentAccessToken() != null;
-    }
-
-    /**
      * Get users' feed and combine them with the list of social media objects
      */
     private void getFbFeed() {
-        if(isFacebookLoggedIn()){
-            GraphRequest request = new GraphRequest(
-                    AccessToken.getCurrentAccessToken(),
-                    "/me/feed",
-                    null,
-                    HttpMethod.GET,
-                    new GraphRequest.Callback() {
-                        public void onCompleted(GraphResponse response) {
-                            Gson gson = new Gson();
-                            String fbFeedJson = response.getJSONObject().toString();
-                            FacebookFeedObject fbFeed = gson.fromJson(fbFeedJson, FacebookFeedObject.class);
-                            Log.d(TAG, "onCompleted: FeedJson " + fbFeedJson);
-                            Log.d(TAG, "onCompleted: " + fbFeed.getData().toString());
-                            if(!fbFeed.getData().toString().isEmpty()){
-                                String postId = fbFeed.getData().get(0).getId();
-                                Log.d(TAG, "onCompleted: ID<><><><" + postId);
-                                List<Object> fbFeedList = new ArrayList<Object>();
-                                for (FacebookFeedObject.FbData data : fbFeed.getData()) fbFeedList.add(data);
-                                newsFeedObjectLists.add(fbFeedList);
-                                updateNewsFeed();
-//                                socialMediaItemList.addAll((ArrayList)fbFeed.getData());
-//                                dashBoardRVAdapter.setItems(socialMediaItemList);
-//                                dashBoardRVAdapter.notifyDataSetChanged();
-                            }
+        GraphRequest request = new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/feed",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        Gson gson = new Gson();
+                        String fbFeedJson = response.getJSONObject().toString();
+                        FacebookFeedObject fbFeed = gson.fromJson(fbFeedJson, FacebookFeedObject.class);
+                        Log.d(TAG, "onCompleted: FeedJson " + fbFeedJson);
+                        Log.d(TAG, "onCompleted: " + fbFeed.getData().toString());
+                        if(!fbFeed.getData().toString().isEmpty()){
+                            String postId = fbFeed.getData().get(0).getId();
+                            Log.d(TAG, "onCompleted: ID<><><><" + postId);
+                            List<Object> fbFeedList = new ArrayList<Object>();
+                            for (FacebookFeedObject.FbData data : fbFeed.getData()) fbFeedList.add(data);
+                            newsFeedObjectLists.add(fbFeedList);
+                            updateNewsFeed();
                         }
                     }
-            );
-            Bundle parameters = new Bundle();
-            parameters.putString("fields","id,name,link,icon,message,created_time,description,picture,story,permalink_url,from, full_picture");
-            request.setParameters(parameters);
-            request.executeAsync();
-        }
+                }
+        );
+        Bundle parameters = new Bundle();
+        parameters.putString("fields",FB_PERMISSIONS);
+        request.setParameters(parameters);
+        request.executeAsync();
     }
 
     // -------------- PINTERST --------------------//
@@ -572,7 +535,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     // ----------------- TWITTER ------------------ //
 
     private void handleTwitterApi(){
-        TwitterSession session = Twitter.getSessionManager().getActiveSession();
         StatusesService statusService = Twitter.getInstance().getApiClient().getStatusesService();
         statusService.homeTimeline(null,null,null,null,null,null,null).enqueue(new Callback<List<Tweet>>() {
             @Override
@@ -580,38 +542,15 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 final List<Object> tweetList = new ArrayList<>();
                 for (Tweet tweet : response.body()){
                     tweetList.add(tweet);
-                    Log.i(TAG, "success: tweet " + tweet.text);
                 }
-                Log.i(TAG, "success: list empty?");
                 newsFeedObjectLists.add(tweetList);
                 updateNewsFeed();
             }
             @Override
             public void onFailure(Call<List<Tweet>> call, Throwable t) {
-
+                t.printStackTrace();
             }
         });
-    }
-
-    private com.twitter.sdk.android.core.Callback<TimelineResult<Tweet>> getTweetResult(){
-        return new com.twitter.sdk.android.core.Callback<TimelineResult<Tweet>>() {
-            @Override
-            public void success(Result<TimelineResult<Tweet>> result) {
-                final List<Object> tweetList = new ArrayList<>();
-                for (Tweet tweet : result.data.items){
-                    tweetList.add(tweet);
-                    Log.i(TAG, "success: tweet " + tweet.text);
-                }
-                Log.i(TAG, "success: list empty?");
-                newsFeedObjectLists.add(tweetList);
-                updateNewsFeed();
-            }
-
-            @Override
-            public void failure(TwitterException exception) {
-                exception.printStackTrace();
-            }
-        };
     }
 
     /**

@@ -269,8 +269,8 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Picasso.with(context).load(instagramData.getImages().getStandard_resolution().getUrl()).into(instagramViewHolder.instagramImageView);
         instagramViewHolder.instagramImageButton.setBackgroundResource(R.drawable.roundcorner);
         Date time=new java.util.Date((long)Integer.parseInt(instagramData.getCreated_time())*1000);
-        Log.i(TAG, "configureInstagramViewHolder: timestamp" + time);
         instagramViewHolder.instagramTimeTextView.setText(getTimeDiffInstagram(time.toString()));
+        Log.i(TAG, "configureInstagramViewHolder: url - " + instagramData.getLink());
         instagramViewHolder.bindInstagramCardClick(cardClickListener, instagramData.getLink());
     }
 
@@ -284,9 +284,9 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         twitterViewHolder.twitterImageButton.getBackground().setColorFilter(twitterViewHolder.color, PorterDuff.Mode.SRC_ATOP);
         Picasso.with(context).load(tweet.user.profileImageUrl).into(twitterViewHolder.twitterImageView);
         if (tweet.entities.urls.size()>0) {
-            Log.i(TAG, "configureTwitterViewHolder: url link - " + tweet.entities.urls.get(0).displayUrl);
-            twitterViewHolder.bindTwitterCardClick(cardClickListener,tweet.entities.urls.get(0).displayUrl);
-        }else twitterViewHolder.bindTwitterCardClick(cardClickListener,"www.twitter.com"); //temp source, no link
+            Log.i(TAG, "configureTwitterViewHolder: url link - " + tweet.entities.urls.get(0).expandedUrl);
+            twitterViewHolder.bindTwitterCardClick(cardClickListener,tweet.entities.urls.get(0).expandedUrl);
+        }else twitterViewHolder.bindTwitterCardClick(cardClickListener,"https://www.twitter.com/"); //temp source, no link
 
     }
 
