@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Rect;
 import android.icu.util.BuddhistCalendar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -19,12 +20,14 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -65,9 +68,11 @@ import getsterr.getsterr.R;
 import getsterr.getsterr.activities.login.LoginActivity;
 import getsterr.getsterr.activities.main.MainActivity;
 import getsterr.getsterr.activities.youtube.YoutubeDisplayActivity;
+import getsterr.getsterr.models.bing.BingImageResult;
 import getsterr.getsterr.models.bing.BingResult;
 import getsterr.getsterr.models.bing.BingResultCard;
 import getsterr.getsterr.models.SocialMediaCard;
+import getsterr.getsterr.models.bing.BingVideoResult;
 import getsterr.getsterr.models.bing.Value;
 import getsterr.getsterr.models.facebook.FacebookFeedObject;
 import getsterr.getsterr.models.instagram.InstagramResponseObj;
@@ -85,7 +90,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener, DashBoardRVAdapter.CardClickListener, DashBoardRVAdapter.YoutubeCardClickListener{
+public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener, DashBoardRVAdapter.CardClickListener, DashBoardRVAdapter.YoutubeCardClickListener, DashBoardRVAdapter.CardLongClickListener, DashBoardRVAdapter.LastResultShownListener{
 
     private static final String TAG = DashBoardActivity.class.getSimpleName();
 
@@ -96,11 +101,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     Toolbar dashBoardToolbar;
     ActionBar dashBoardActionBar;
     Map<String,Boolean> checkedMap;
-
+    String query;
     EditText dashSearchEditText;
+    boolean isKeyboardOpen;
     DashBoardRVAdapter dashBoardRVAdapter;
     List<List<Object>> newsFeedObjectLists = new ArrayList<>();
     ArrayList<Object> socialMediaItemList = new ArrayList<>();
+    List<Object> searchItemList = new ArrayList<>();
 
     private PDKResponse myPinsResponse;
     private boolean loading = false;
@@ -151,10 +158,30 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     }
 
     @Override
+    public void onCardLongClick(String url) {
+        startShareIntent(url);
+    }
+
+    @Override
     public void onYoutubeCardClick(String videoId) {
         Intent youtubeIntent = new Intent(this, YoutubeDisplayActivity.class);
         youtubeIntent.putExtra(YoutubeDisplayActivity.YOUTUBE_DISPLAY_KEY,videoId);
         startActivity(youtubeIntent);
+    }
+
+    @Override
+    public void onLastResultShown(int offset, char searchType) {
+        switch (searchType){
+            case 'w':
+                makeBingApiCall(query,offset);
+                break;
+            case 'i':
+                makeBingImageApiCall(query,offset);
+                break;
+            case 'v':
+                makeBingVideoApiCall(query,offset);
+                break;
+        }
     }
 
     private void initViews(){
@@ -189,8 +216,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     private void displayRv(List<Object> list){
         dashBoardRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        dashBoardRVAdapter = new DashBoardRVAdapter(list, DashBoardActivity.this, this);
+        dashBoardRVAdapter = new DashBoardRVAdapter(list, DashBoardActivity.this, this, this, this);
         dashBoardRecyclerView.setAdapter(dashBoardRVAdapter);
+    }
+
+    private void updateSearchRv(){
+        dashBoardRVAdapter.notifyItemRangeInserted(searchItemList.size()-25,25);
     }
 
     private void displayNewsFeed(){
@@ -263,7 +294,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_GO){
                     Log.i(TAG, "onKey: enter clicked");
-                    makeBingApiCall(dashSearchEditText.getText().toString());
+                    makeBingVideoApiCall(dashSearchEditText.getText().toString(),0); //TODO: CHANGE BACK TO makeBingSearchCall ONCE UI IS IMPLEMENTED
 //                    makeYoutubeApiCall(dashSearchEditText.getText().toString());
                     return true;
                 }
@@ -313,12 +344,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     /**
      * Use RxJava to make a bing api call
      */
-    private void makeBingApiCall(final String query){
-        //TODO Some searches return errors
+    private void makeBingApiCall(final String enteredQuery, final int offset){
 //        String input = dashSearchEditText.getText().toString();
-        hideKeyboard();
-        BingAPISearchService.BingSearchRx bingSearch = BingAPISearchService.createRx();
-        Observable<BingResult> observable = bingSearch.getBingAPIResult(query, 10, 0, "en-us", "Moderate", "c0ab638b9edf43d7bab3e27bfc8d0afc");
+        if (enteredQuery.equals("")) return;
+        query = enteredQuery;
+        if (offset==0) hideKeyboard();
+        BingAPISearchService.BingSearchRx bingSearch = BingAPISearchService.createRx(Constants.BING_API_SEARCH_URL);
+        Observable<BingResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BingResult>() {
@@ -338,12 +370,96 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         Log.d(TAG, "onNext: " + bingResults.toString());
                         Log.d(TAG, "onNext: " + bingResults.getWebPages().getWebSearchUrl());
 
-                        ArrayList<Object> items = new ArrayList<Object>();
+//                        ArrayList<Object> items = new ArrayList<Object>();
+
                         for(Value val: bingResults.getWebPages().getValue()){
-                            items.add(val);
+                            searchItemList.add(val);
                         }
-                        if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,items);
-                        else displayRv(items);
+                        if (offset>0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        else displayRv(searchItemList);
+                    }
+                });
+    }
+
+    /**
+     * Use RxJava to make a bing image api call
+     */
+    private void makeBingImageApiCall(final String enteredQuery, final int offset){
+//        String input = dashSearchEditText.getText().toString();
+        if (enteredQuery.equals("")) return;
+        query = enteredQuery;
+        if (offset==0) hideKeyboard();
+        BingAPISearchService.BingImageRx bingSearch = BingAPISearchService.createImageRx();
+        Observable<BingImageResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
+        observable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BingImageResult>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.i(TAG, "onCompleted: ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(BingImageResult bingResults) {
+                        Log.d(TAG, "onNext: BING RESULTS RETURNED");
+                        Log.d(TAG, "onNext: " + bingResults.toString());
+                        Log.d(TAG, "onNext: " + bingResults.getWebSearchUrl());
+
+//                        ArrayList<Object> items = new ArrayList<Object>();
+                        if (offset==0) searchItemList.clear();
+                        for(BingImageResult.BingImageObj val: bingResults.getValue()){
+                            searchItemList.add(val);
+                        }
+                        if (offset>0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        else displayRv(searchItemList);
+                    }
+                });
+    }
+
+    /**
+     * Use RxJava to make a bing video api call
+     */
+    private void makeBingVideoApiCall(final String enteredQuery, final int offset){
+//        String input = dashSearchEditText.getText().toString();
+        if (enteredQuery.equals("")) return;
+        query = enteredQuery;
+        if (offset==0) hideKeyboard();
+        BingAPISearchService.BingVideoRx bingSearch = BingAPISearchService.createVideoRx();
+        Observable<BingVideoResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
+        observable.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<BingVideoResult>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.i(TAG, "onCompleted: ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(BingVideoResult bingResults) {
+                        Log.d(TAG, "onNext: BING RESULTS RETURNED");
+                        Log.d(TAG, "onNext: " + bingResults.toString());
+                        Log.d(TAG, "onNext: " + bingResults.getWebSearchUrl());
+
+//                        ArrayList<Object> items = new ArrayList<Object>();
+                        if (offset==0) searchItemList.clear();
+                        for(BingVideoResult.BingVideoObj val: bingResults.getValue()){
+                            searchItemList.add(val);
+                        }
+                        if (offset>0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        else displayRv(searchItemList);
                     }
                 });
     }
@@ -579,10 +695,38 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         else twitterButton.setVisibility(View.GONE);
     }
 
+    private void startShareIntent(String url){
+        Intent i=new Intent(android.content.Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Check out this search!");
+        i.putExtra(android.content.Intent.EXTRA_TEXT, url);
+        startActivity(Intent.createChooser(i,"Share via"));
+    }
+
     private void hideKeyboard(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
     }
+
+    private boolean isKeyboardOpen(){
+        final LinearLayout rootLayout = (LinearLayout) findViewById(R.id.activity_dash_board);
+        rootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                rootLayout.getWindowVisibleDisplayFrame(rect);
+                int screenHeight = rootLayout.getRootView().getHeight();
+                int keypadHeight = screenHeight - rect.bottom;
+                Log.i(TAG, "onGlobalLayout: keypad height " + keypadHeight);
+                if (keypadHeight>screenHeight*0.15) isKeyboardOpen = true;
+                else isKeyboardOpen = false;
+            }
+        });
+        return isKeyboardOpen;
+    }
+
+
     private void logKeyHash(){
         PackageInfo info;
         try {

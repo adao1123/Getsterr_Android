@@ -1,6 +1,9 @@
 package getsterr.getsterr.providers;
 
+import getsterr.getsterr.models.bing.BingImageResult;
 import getsterr.getsterr.models.bing.BingResult;
+import getsterr.getsterr.models.bing.BingVideoResult;
+import getsterr.getsterr.utilities.Constants;
 import getsterr.getsterr.utilities.UtilityFunctions;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -15,7 +18,6 @@ import rx.Observable;
 
 public class BingAPISearchService {
 
-    public static final String API_URL = "https://api.cognitive.microsoft.com/bing/v5.0/";
 
     public interface BingSearchRx {
         @GET("search")
@@ -27,13 +29,54 @@ public class BingAPISearchService {
                                                 @Query("subscription-key") String key);
     }
 
-    public static BingSearchRx createRx(){
+    public interface BingImageRx {
+        @GET("search")
+        Observable<BingImageResult> getBingAPIResult(@Query("q") String query,
+                                                     @Query("count") int count,
+                                                     @Query("offset") int offset,
+                                                     @Query("mkt") String market,
+                                                     @Query("safesearch") String safesearch,
+                                                     @Query("subscription-key") String key);
+    }
+
+    public interface BingVideoRx {
+        @GET("search")
+        Observable<BingVideoResult> getBingAPIResult(@Query("q") String query,
+                                                     @Query("count") int count,
+                                                     @Query("offset") int offset,
+                                                     @Query("mkt") String market,
+                                                     @Query("safesearch") String safesearch,
+                                                     @Query("subscription-key") String key);
+    }
+
+    public static BingSearchRx createRx(String apiUrl){
         return new Retrofit.Builder()
-                .baseUrl(API_URL)
+                .baseUrl(apiUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UtilityFunctions.getOkHttpLoggingClient())      //For debugging
                 .build()
                 .create(BingSearchRx.class);
     }
+
+    public static BingImageRx createImageRx(){
+        return new Retrofit.Builder()
+                .baseUrl(Constants.BING_IMAGE_API_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(UtilityFunctions.getOkHttpLoggingClient())
+                .build()
+                .create(BingImageRx.class);
+    }
+
+    public static BingVideoRx createVideoRx(){
+        return new Retrofit.Builder()
+                .baseUrl(Constants.BING_VIDEO_API_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(UtilityFunctions.getOkHttpLoggingClient())
+                .build()
+                .create(BingVideoRx.class);
+    }
+
 }

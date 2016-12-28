@@ -45,5 +45,8 @@ public class Constants {
     public static final String INSTAGRAM_CODE_INTENTKEY = "CODE_KEY";
     public static final String INSTAGRAM_AUTHORIZATION_CODE = "authorization_code";
 
-
+    public static final String BING_SUBSCRIPTION_KEY = "c0ab638b9edf43d7bab3e27bfc8d0afc";
+    public static final String BING_API_SEARCH_URL = "https://api.cognitive.microsoft.com/bing/v5.0/";
+    public static final String BING_IMAGE_API_URL = "https://api.cognitive.microsoft.com/bing/v5.0/images/";
+    public static final String BING_VIDEO_API_URL = "https://api.cognitive.microsoft.com/bing/v5.0/videos/";
 }

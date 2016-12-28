@@ -26,6 +26,8 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import getsterr.getsterr.R;
+import getsterr.getsterr.models.bing.BingImageResult;
+import getsterr.getsterr.models.bing.BingVideoResult;
 import getsterr.getsterr.models.bing.Value;
 import getsterr.getsterr.models.facebook.FacebookFeedObject;
 import getsterr.getsterr.models.instagram.InstagramResponseObj.InstagramData;
@@ -45,17 +47,23 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public static final int YOUTUBE_RESULT_CARD = 3;
     public static final int INSTAGRAM_MEDIA_CARD = 4;
     public static final int TWITTER_MEDIA_CARD = 5;
+    public static final int BING_IMAGE_RESULT_CARD = 6;
+    public static final int BING_VIDEO_RESULT_CARD = 7;
 
 
     List<Object> cardItems;
     public final CardClickListener cardClickListener;
     public final YoutubeCardClickListener youtubeCardClickListener;
+    public final CardLongClickListener cardLongClickListener;
+    public final LastResultShownListener lastResultShownListener;
     Context context;
 
-    public DashBoardRVAdapter(List<Object> cardItems, CardClickListener cardClickListener, YoutubeCardClickListener youtubeCardClickListener){
+    public DashBoardRVAdapter(List<Object> cardItems, CardClickListener cardClickListener, YoutubeCardClickListener youtubeCardClickListener, CardLongClickListener cardLongClickListener, LastResultShownListener lastResultShownListener){
         this.cardItems = cardItems;
         this.cardClickListener = cardClickListener;
         this.youtubeCardClickListener = youtubeCardClickListener;
+        this.cardLongClickListener = cardLongClickListener;
+        this.lastResultShownListener = lastResultShownListener;
     }
 
     /**
@@ -80,6 +88,20 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         void onYoutubeCardClick(String videoId);
     }
 
+    /**
+     * Interface to pass object urls to DashBoardActivity from a long click
+     */
+    public interface CardLongClickListener{
+        void onCardLongClick(String url);
+    }
+
+    /**
+     * Interface to let Dashboard Activity know when last card is shown to load more results
+     */
+    public interface LastResultShownListener{
+        void onLastResultShown(int offset, char searchType);
+    }
+
 
     /**
      * Look at each position of list passed from DashBoardActivity and select the correct viewtype associated with position
@@ -95,6 +117,8 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         else if(cardItems.get(position) instanceof Resource) return YOUTUBE_RESULT_CARD;
         else if(cardItems.get(position) instanceof InstagramData) return INSTAGRAM_MEDIA_CARD;
         else if(cardItems.get(position) instanceof Tweet) return TWITTER_MEDIA_CARD;
+        else if(cardItems.get(position) instanceof BingImageResult.BingImageObj) return BING_IMAGE_RESULT_CARD;
+        else if(cardItems.get(position) instanceof BingVideoResult.BingVideoObj) return BING_VIDEO_RESULT_CARD;
         return -1;
     }
 
@@ -133,6 +157,14 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             case TWITTER_MEDIA_CARD:
                 View view6 = inflater.inflate(R.layout.rv_item_social_twitter, parent, false);
                 viewHolder = new TwitterViewHolder(view6);
+                break;
+            case BING_IMAGE_RESULT_CARD:
+                View view7 = inflater.inflate(R.layout.rv_item_youtube_search, parent,false);
+                viewHolder = new BingImageViewHolder(view7);
+                break;
+            case BING_VIDEO_RESULT_CARD:
+                View view8 = inflater.inflate(R.layout.rv_item_youtube_search, parent,false);
+                viewHolder = new BingImageViewHolder(view8);
                 break;
             default:
                 View view = inflater.inflate(R.layout.rv_item_bing_search, parent, false);
@@ -174,6 +206,14 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 TwitterViewHolder twitterViewHolder = (TwitterViewHolder) viewHolder;
                 configureTwitterViewHolder(twitterViewHolder, position);
                 break;
+            case BING_IMAGE_RESULT_CARD:
+                BingImageViewHolder bingImageViewHolder = (BingImageViewHolder) viewHolder;
+                configureBingImageViewHolder(bingImageViewHolder, position);
+                break;
+            case BING_VIDEO_RESULT_CARD:
+                BingImageViewHolder bingVideoViewHolder = (BingImageViewHolder) viewHolder;
+                configureBingVideoViewHolder(bingVideoViewHolder, position);
+                break;
             default:
                 BingResultViewHolder vHolder = (BingResultViewHolder)viewHolder;
                 configureBingResultViewHolder(vHolder, position);
@@ -200,6 +240,8 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Log.i(TAG, "configureBingResultViewHolder: url - " + value.getUrl());
         Log.i(TAG, "configureBingResultViewHolder: display url - " + value.getDisplayUrl());
         bingResultViewHolder.bindBingResultCardClick(cardClickListener, value.getUrl());
+        bingResultViewHolder.bindLongClick(cardLongClickListener, value.getUrl());
+        if (position>=cardItems.size()-1) lastResultShownListener.onLastResultShown(position+2,'w');
     }
 
     /**
@@ -298,6 +340,24 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         Picasso.with(context).load(resource.getSnippet().getThumbnails().getHigh().getUrl())
                 .into(youtubeSearchViewHolder.thumbnailIv);
 
+    }
+
+    private void configureBingImageViewHolder(BingImageViewHolder viewHolder, int position){
+        BingImageResult.BingImageObj bingImageObj = (BingImageResult.BingImageObj) cardItems.get(position);
+        viewHolder.titleTv.setText(bingImageObj.getName());
+        viewHolder.descriptionTv.setText(bingImageObj.getHostPageDisplayUrl());
+        Picasso.with(context).load(bingImageObj.getThumbnailUrl()).into(viewHolder.thumbnailIv);
+        viewHolder.bind(cardClickListener, bingImageObj.getHostPageDisplayUrl());
+        if (position>=cardItems.size()-1) lastResultShownListener.onLastResultShown(position+2,'i');
+    }
+
+    private void configureBingVideoViewHolder(BingImageViewHolder viewHolder, int position){
+        BingVideoResult.BingVideoObj bingVideoObj = (BingVideoResult.BingVideoObj) cardItems.get(position);
+        viewHolder.titleTv.setText(bingVideoObj.getName());
+        viewHolder.descriptionTv.setText(bingVideoObj.getDescription());
+        Picasso.with(context).load(bingVideoObj.getThumbnailUrl()).into(viewHolder.thumbnailIv);
+        viewHolder.bind(cardClickListener, bingVideoObj.getContentUrl());
+        if (position>=cardItems.size()-1) lastResultShownListener.onLastResultShown(position+2,'v');
     }
 
     /**
@@ -465,6 +525,16 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
             });
         }
+
+        public void bindLongClick(final CardLongClickListener cardLongClickListener, final String shareUrl){
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    cardLongClickListener.onCardLongClick(shareUrl);
+                    return true;
+                }
+            });
+        }
     }
 
     /**
@@ -485,6 +555,28 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 @Override
                 public void onClick(View view) {
                     listener.onYoutubeCardClick(videoId);
+                }
+            });
+        }
+    }
+    /**
+     * ViewHolder for Youtube Search results
+     */
+    public static class BingImageViewHolder extends RecyclerView.ViewHolder{
+        public TextView titleTv;
+        public TextView descriptionTv;
+        public ImageView thumbnailIv;
+        public BingImageViewHolder(View itemView) {
+            super(itemView);
+            titleTv = (TextView)itemView.findViewById(R.id.rv_item_title);
+            descriptionTv = (TextView) itemView.findViewById(R.id.rv_item_description);
+            thumbnailIv = (ImageView) itemView.findViewById(R.id.rv_item_iv);
+        }
+        public void bind(final CardClickListener listener, final String url){
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onCardClick(url);
                 }
             });
         }
