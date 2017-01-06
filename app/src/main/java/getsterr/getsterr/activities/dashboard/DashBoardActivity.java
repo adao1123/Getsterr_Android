@@ -152,6 +152,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      */
     @Override
     public void onCardClick(String cardUrl) {
+
         Intent intent = new Intent(DashBoardActivity.this, WebViewActivity.class);
         intent.putExtra(Constants.URL_INTENTKEY, cardUrl);
         startActivity(intent);
