@@ -2,11 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <FrameLayout
+        android:id="@+id/clickable_preview_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="2dp"/>
     <WebView
         android:id="@+id/WebView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
     </WebView>
 
     <ProgressBar

@@ -66,4 +66,5 @@ dependencies {
     //LinkedIn
     compile project(':linkedin-sdk')
     compile files('libs/YouTubeAndroidPlayerApi.jar')
+    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
 }

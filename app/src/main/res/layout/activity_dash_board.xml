@@ -190,10 +190,23 @@
             android:id="@+id/dashbard_recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-        <!--<fragment-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--/>-->
+        <FrameLayout
+            android:id="@+id/preview_container_frame"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="match_parent">
+            <FrameLayout
+                android:id="@+id/preview_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"/>
+            <FrameLayout
+                android:id="@+id/preview_container_cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="30dp"
+                android:elevation="2dp"/>
+        </FrameLayout>
     </FrameLayout>
 
 

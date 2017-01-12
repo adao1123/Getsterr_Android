@@ -7,6 +7,10 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Rect;
 import android.icu.util.BuddhistCalendar;
+import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,6 +39,10 @@ import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.linkedin.platform.APIHelper;
 import com.linkedin.platform.errors.LIApiError;
@@ -68,6 +77,7 @@ import getsterr.getsterr.R;
 import getsterr.getsterr.activities.login.LoginActivity;
 import getsterr.getsterr.activities.main.MainActivity;
 import getsterr.getsterr.activities.youtube.YoutubeDisplayActivity;
+import getsterr.getsterr.fragments.SearchPreviewFragment;
 import getsterr.getsterr.models.bing.BingImageResult;
 import getsterr.getsterr.models.bing.BingResult;
 import getsterr.getsterr.models.bing.BingResultCard;
@@ -90,29 +100,41 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener, DashBoardRVAdapter.CardClickListener, DashBoardRVAdapter.YoutubeCardClickListener, DashBoardRVAdapter.CardLongClickListener, DashBoardRVAdapter.LastResultShownListener{
+public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener, DashBoardRVAdapter.CardClickListener,
+        DashBoardRVAdapter.YoutubeCardClickListener, DashBoardRVAdapter.CardLongClickListener, DashBoardRVAdapter.LastResultShownListener,
+        SearchPreviewFragment.OnPreviewClickListener, View.OnTouchListener {
 
     private static final String TAG = DashBoardActivity.class.getSimpleName();
 
     RecyclerView dashBoardRecyclerView;
 
-    ImageButton  twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton;
+    ImageButton twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton;
     FrameLayout facebookButton;
     Toolbar dashBoardToolbar;
     ActionBar dashBoardActionBar;
-    Map<String,Boolean> checkedMap;
+    Map<String, Boolean> checkedMap;
     String query;
+    FrameLayout previewContainer;
     EditText dashSearchEditText;
     boolean isKeyboardOpen;
+    FrameLayout previewContainerFrame;
     DashBoardRVAdapter dashBoardRVAdapter;
     List<List<Object>> newsFeedObjectLists = new ArrayList<>();
     ArrayList<Object> socialMediaItemList = new ArrayList<>();
     List<Object> searchItemList = new ArrayList<>();
+    private static final int viewSize = 66;    private static final int boundary = 35;
+    private float dx;
+    private int width;
 
     private PDKResponse myPinsResponse;
     private boolean loading = false;
     private static final String PIN_FIELDS = "id,link,creator,image,counts,note,created_at,board,metadata";
     private static final String FB_PERMISSIONS = "id,name,link,icon,message,created_time,description,picture,story,permalink_url,from, full_picture";
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,11 +152,14 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         // Get items from social media
         displayNewsFeed();
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.menu_hamburger_iv:
                 Intent loginIntent = new Intent(this, LoginActivity.class);
                 startActivity(loginIntent);
@@ -143,18 +168,27 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 newsFeedObjectLists.clear();
                 displayNewsFeed();
                 break;
+            case R.id.preview_container_cover:
+                break;
         }
     }
 
     /**
      * When a card is clicked use url passed from DashBoardRVAdapter to open url in WebView Activity
+     *
      * @param cardUrl
      */
     @Override
     public void onCardClick(String cardUrl) {
+        showSearchPreview(cardUrl);
 
+    }
+
+    @Override
+    public void onPreviewClicked(String url) {
+        previewContainer.setVisibility(View.GONE);
         Intent intent = new Intent(DashBoardActivity.this, WebViewActivity.class);
-        intent.putExtra(Constants.URL_INTENTKEY, cardUrl);
+        intent.putExtra(Constants.URL_INTENTKEY, url);
         startActivity(intent);
     }
 
@@ -166,75 +200,106 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onYoutubeCardClick(String videoId) {
         Intent youtubeIntent = new Intent(this, YoutubeDisplayActivity.class);
-        youtubeIntent.putExtra(YoutubeDisplayActivity.YOUTUBE_DISPLAY_KEY,videoId);
+        youtubeIntent.putExtra(YoutubeDisplayActivity.YOUTUBE_DISPLAY_KEY, videoId);
         startActivity(youtubeIntent);
     }
 
     @Override
     public void onLastResultShown(int offset, char searchType) {
-        switch (searchType){
+        switch (searchType) {
             case 'w':
-                makeBingApiCall(query,offset);
+                makeBingApiCall(query, offset);
                 break;
             case 'i':
-                makeBingImageApiCall(query,offset);
+                makeBingImageApiCall(query, offset);
                 break;
             case 'v':
-                makeBingVideoApiCall(query,offset);
+                makeBingVideoApiCall(query, offset);
                 break;
         }
     }
 
-    private void initViews(){
-        dashBoardRecyclerView = (RecyclerView)findViewById(R.id.dashbard_recyclerView);
-        dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
-        facebookButton = (FrameLayout)findViewById(R.id.dash_facebook_button);
-        twitterButton = (ImageButton)findViewById(R.id.dash_twitter_button);
-        pinterestButton = (ImageButton)findViewById(R.id.dash_pinterest_button);
-        linkedinButton = (ImageButton)findViewById(R.id.dash_linkedin_button);
-        youtubeButton = (ImageButton)findViewById(R.id.dash_youtube_button);
-        instagramButton = (ImageButton)findViewById(R.id.dash_instagram_button);
-        dashSearchEditText = (EditText)findViewById(R.id.dash_search_editText);
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        switch (motionEvent.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                dx = view.getX() - motionEvent.getRawX();
+                break;
+            case MotionEvent.ACTION_MOVE:
+//                if (motionEvent.getRawX()+dx >= width-convertDpToPx(boundary+viewSize)) return true; //sets boundaries
+//                if (motionEvent.getRawX()+dx <= convertDpToPx(boundary)) return true; //sets boundaries
+//                view.animate().x(motionEvent.getRawX()+dx).setDuration(0).start();
+                previewContainerFrame.animate().x(motionEvent.getRawX()+dx).setDuration(0).start();
+                break;
+            default:
+                return false;
+        }
+        return true;
     }
 
-    private void initActionBar(){
-        Toolbar mainToolbar = (Toolbar)findViewById(R.id.dashboard_toolbar);
+
+    /**
+     * Coverts the input dp and returns px
+     * @param dp
+     * @return
+     */
+    private float convertDpToPx(int dp){
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getBaseContext().getResources().getDisplayMetrics());
+    }
+
+
+    private void initViews() {
+        dashBoardRecyclerView = (RecyclerView) findViewById(R.id.dashbard_recyclerView);
+        dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
+        previewContainer = (FrameLayout) findViewById(R.id.preview_container);
+        facebookButton = (FrameLayout) findViewById(R.id.dash_facebook_button);
+        twitterButton = (ImageButton) findViewById(R.id.dash_twitter_button);
+        pinterestButton = (ImageButton) findViewById(R.id.dash_pinterest_button);
+        linkedinButton = (ImageButton) findViewById(R.id.dash_linkedin_button);
+        youtubeButton = (ImageButton) findViewById(R.id.dash_youtube_button);
+        instagramButton = (ImageButton) findViewById(R.id.dash_instagram_button);
+        dashSearchEditText = (EditText) findViewById(R.id.dash_search_editText);
+    }
+
+    private void initActionBar() {
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
         setSupportActionBar(mainToolbar);
         ActionBar mainActionBar = getSupportActionBar();
         mainActionBar.setDisplayShowHomeEnabled(false);
         mainActionBar.setDisplayShowTitleEnabled(false);
         LayoutInflater inflater = LayoutInflater.from(this);
-        View actionBarView = inflater.inflate(R.layout.actionbar_layout,null);
-        TextView toolbarTitleTv = (TextView)actionBarView.findViewById(R.id.menu_title_tv);
+        View actionBarView = inflater.inflate(R.layout.actionbar_layout, null);
+        TextView toolbarTitleTv = (TextView) actionBarView.findViewById(R.id.menu_title_tv);
         toolbarTitleTv.setText("Dashboard");
         mainActionBar.setCustomView(actionBarView);
         mainActionBar.setDisplayShowCustomEnabled(true);
-        ImageView loginButton = (ImageView)actionBarView.findViewById(R.id.menu_hamburger_iv);
+        ImageView loginButton = (ImageView) actionBarView.findViewById(R.id.menu_hamburger_iv);
         loginButton.setOnClickListener(this);
-        ImageView iconButton = (ImageView)actionBarView.findViewById(R.id.menu_logo_iv);
+        ImageView iconButton = (ImageView) actionBarView.findViewById(R.id.menu_logo_iv);
         iconButton.setOnClickListener(this);
     }
 
-    private void displayRv(List<Object> list){
+    private void displayRv(List<Object> list) {
         dashBoardRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         dashBoardRVAdapter = new DashBoardRVAdapter(list, DashBoardActivity.this, this, this, this);
         dashBoardRecyclerView.setAdapter(dashBoardRVAdapter);
     }
 
-    private void updateSearchRv(){
-        dashBoardRVAdapter.notifyItemRangeInserted(searchItemList.size()-25,25);
+    private void updateSearchRv() {
+        dashBoardRVAdapter.notifyItemRangeInserted(searchItemList.size() - 25, 25);
     }
 
-    private void displayNewsFeed(){
+    private void displayNewsFeed() {
         makeCheckedApiCalls();
         displayRv(combineNewsFeedLists());
     }
 
-    private void updateNewsFeed(){
+    private void updateNewsFeed() {
         displayRv(combineNewsFeedLists());
     }
 
-    private void makeCheckedApiCalls(){
+    private void makeCheckedApiCalls() {
         if (checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY)) handleInstagramApi();
         if (checkedMap.get(Constants.FACEBOOK_CHECK_INTENTKEY)) handleFacebookApi();
         if (checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY)) handleLinkedInApi();
@@ -242,33 +307,32 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY)) handleTwitterApi();
     }
 
-    private List<Object> combineNewsFeedLists(){
+    private List<Object> combineNewsFeedLists() {
         List<Object> combinedList = new ArrayList<>();
         int min = 100; //max num
-        for (List<Object> list : newsFeedObjectLists) if (list.size()<min) min=list.size();
-        for (int index = 0; index < min; index++){
+        for (List<Object> list : newsFeedObjectLists) if (list.size() < min) min = list.size();
+        for (int index = 0; index < min; index++) {
             for (List<Object> list : newsFeedObjectLists) combinedList.add(list.get(index));
         }
         return combinedList;
     }
 
-    private void combineSearchLists(List<Object> youtubeList, List<Object> bingList){
+    private void combineSearchLists(List<Object> youtubeList, List<Object> bingList) {
         List<Object> searchList = new ArrayList<>();
         int minSize;
-        if (youtubeList.size()<=bingList.size()) minSize = youtubeList.size();
+        if (youtubeList.size() <= bingList.size()) minSize = youtubeList.size();
         else minSize = bingList.size();
-        for (int index = 0; index < minSize; index++){
-            searchList.add((Value)bingList.get(index));
-            searchList.add((YoutubeObject.Resource)youtubeList.get(index));
+        for (int index = 0; index < minSize; index++) {
+            searchList.add((Value) bingList.get(index));
+            searchList.add((YoutubeObject.Resource) youtubeList.get(index));
         }
         displayRv(searchList);
     }
 
     /**
      * Perform Bing API Search when search icon is clicked
-     *
      */
-    private void setSearchEditTextListener(){
+    private void setSearchEditTextListener() {
 //        dashSearchEditText.setOnTouchListener(new View.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -293,9 +357,9 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         dashSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_GO){
+                if (i == EditorInfo.IME_ACTION_GO) {
                     Log.i(TAG, "onKey: enter clicked");
-                    makeBingVideoApiCall(dashSearchEditText.getText().toString(),0); //TODO: CHANGE BACK TO makeBingSearchCall ONCE UI IS IMPLEMENTED
+                    makeBingApiCall(dashSearchEditText.getText().toString(), 0); //TODO: CHANGE BACK TO makeBingSearchCall ONCE UI IS IMPLEMENTED
 //                    makeYoutubeApiCall(dashSearchEditText.getText().toString());
                     return true;
                 }
@@ -306,17 +370,18 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     // ----------------- YOUTUBE ------------------ //
 
-    private void makeYoutubeApiCall(String query, final List<Object> bingList){
+    private void makeYoutubeApiCall(String query, final List<Object> bingList) {
         Call<YoutubeObject> call = ApiServiceManager.createYoutubeApiService().getYoutubeSearch(query);
         call.enqueue(new Callback<YoutubeObject>() {
             @Override
             public void onResponse(Call<YoutubeObject> call, Response<YoutubeObject> response) {
                 YoutubeObject youtubeObject = response.body();
-                Log.i(TAG, "onResponse: "+youtubeObject.getItems()[0].getId().getVideoId());
+                Log.i(TAG, "onResponse: " + youtubeObject.getItems()[0].getId().getVideoId());
                 List<Object> youtubeList = new ArrayList<Object>();
-                for (YoutubeObject.Resource resource : response.body().getItems())youtubeList.add(resource);
+                for (YoutubeObject.Resource resource : response.body().getItems())
+                    youtubeList.add(resource);
 //                displayRv(dataList);
-                combineSearchLists(youtubeList,bingList);
+                combineSearchLists(youtubeList, bingList);
             }
 
             @Override
@@ -331,7 +396,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      *
      * @return
      */
-    private ArrayList<Object> getSampleArrayList(){
+    private ArrayList<Object> getSampleArrayList() {
         ArrayList<Object> items = new ArrayList<>();
 
         items.add(new BingResultCard("Bing Search Result Title", "HH:MM:SS", "Bing Description Snippet", "http://www.yahoo.com"));
@@ -345,11 +410,11 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     /**
      * Use RxJava to make a bing api call
      */
-    private void makeBingApiCall(final String enteredQuery, final int offset){
+    private void makeBingApiCall(final String enteredQuery, final int offset) {
 //        String input = dashSearchEditText.getText().toString();
         if (enteredQuery.equals("")) return;
         query = enteredQuery;
-        if (offset==0) hideKeyboard();
+        if (offset == 0) hideKeyboard();
         BingAPISearchService.BingSearchRx bingSearch = BingAPISearchService.createRx(Constants.BING_API_SEARCH_URL);
         Observable<BingResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
@@ -373,11 +438,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
 //                        ArrayList<Object> items = new ArrayList<Object>();
 
-                        for(Value val: bingResults.getWebPages().getValue()){
+                        for (Value val : bingResults.getWebPages().getValue()) {
                             searchItemList.add(val);
                         }
-                        if (offset>0) updateSearchRv();
-                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        if (offset > 0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+                            makeYoutubeApiCall(query, searchItemList);
                         else displayRv(searchItemList);
                     }
                 });
@@ -386,11 +452,11 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     /**
      * Use RxJava to make a bing image api call
      */
-    private void makeBingImageApiCall(final String enteredQuery, final int offset){
+    private void makeBingImageApiCall(final String enteredQuery, final int offset) {
 //        String input = dashSearchEditText.getText().toString();
         if (enteredQuery.equals("")) return;
         query = enteredQuery;
-        if (offset==0) hideKeyboard();
+        if (offset == 0) hideKeyboard();
         BingAPISearchService.BingImageRx bingSearch = BingAPISearchService.createImageRx();
         Observable<BingImageResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
@@ -413,12 +479,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         Log.d(TAG, "onNext: " + bingResults.getWebSearchUrl());
 
 //                        ArrayList<Object> items = new ArrayList<Object>();
-                        if (offset==0) searchItemList.clear();
-                        for(BingImageResult.BingImageObj val: bingResults.getValue()){
+                        if (offset == 0) searchItemList.clear();
+                        for (BingImageResult.BingImageObj val : bingResults.getValue()) {
                             searchItemList.add(val);
                         }
-                        if (offset>0) updateSearchRv();
-                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        if (offset > 0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+                            makeYoutubeApiCall(query, searchItemList);
                         else displayRv(searchItemList);
                     }
                 });
@@ -427,11 +494,11 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     /**
      * Use RxJava to make a bing video api call
      */
-    private void makeBingVideoApiCall(final String enteredQuery, final int offset){
+    private void makeBingVideoApiCall(final String enteredQuery, final int offset) {
 //        String input = dashSearchEditText.getText().toString();
         if (enteredQuery.equals("")) return;
         query = enteredQuery;
-        if (offset==0) hideKeyboard();
+        if (offset == 0) hideKeyboard();
         BingAPISearchService.BingVideoRx bingSearch = BingAPISearchService.createVideoRx();
         Observable<BingVideoResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
@@ -454,12 +521,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         Log.d(TAG, "onNext: " + bingResults.getWebSearchUrl());
 
 //                        ArrayList<Object> items = new ArrayList<Object>();
-                        if (offset==0) searchItemList.clear();
-                        for(BingVideoResult.BingVideoObj val: bingResults.getValue()){
+                        if (offset == 0) searchItemList.clear();
+                        for (BingVideoResult.BingVideoObj val : bingResults.getValue()) {
                             searchItemList.add(val);
                         }
-                        if (offset>0) updateSearchRv();
-                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY)) makeYoutubeApiCall(query,searchItemList);
+                        if (offset > 0) updateSearchRv();
+                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+                            makeYoutubeApiCall(query, searchItemList);
                         else displayRv(searchItemList);
                     }
                 });
@@ -467,7 +535,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     // ----------------- FACEBOOK ------------------ //
 
-    private void handleFacebookApi(){
+    private void handleFacebookApi() {
         getFbFeed();
     }
 
@@ -487,11 +555,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         FacebookFeedObject fbFeed = gson.fromJson(fbFeedJson, FacebookFeedObject.class);
                         Log.d(TAG, "onCompleted: FeedJson " + fbFeedJson);
                         Log.d(TAG, "onCompleted: " + fbFeed.getData().toString());
-                        if(!fbFeed.getData().toString().isEmpty()){
+                        if (!fbFeed.getData().toString().isEmpty()) {
                             String postId = fbFeed.getData().get(0).getId();
                             Log.d(TAG, "onCompleted: ID<><><><" + postId);
                             List<Object> fbFeedList = new ArrayList<Object>();
-                            for (FacebookFeedObject.FbData data : fbFeed.getData()) fbFeedList.add(data);
+                            for (FacebookFeedObject.FbData data : fbFeed.getData())
+                                fbFeedList.add(data);
                             newsFeedObjectLists.add(fbFeedList);
                             updateNewsFeed();
                         }
@@ -499,21 +568,21 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 }
         );
         Bundle parameters = new Bundle();
-        parameters.putString("fields",FB_PERMISSIONS);
+        parameters.putString("fields", FB_PERMISSIONS);
         request.setParameters(parameters);
         request.executeAsync();
     }
 
     // -------------- PINTERST --------------------//
 
-    private void handlePinterestApi(){
+    private void handlePinterestApi() {
         fetchPins();
     }
 
     /**
      * Get users' pins and combine them with the list of social media objects
      */
-    private PDKCallback getPinCallback(){
+    private PDKCallback getPinCallback() {
         PDKCallback myPinsCallback = new PDKCallback() {
             @Override
             public void onSuccess(PDKResponse response) {
@@ -545,18 +614,18 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     // -------------- INSTAGRAM --------------------//
 
-    private void handleInstagramApi(){
+    private void handleInstagramApi() {
         makeApiCallforUserInfo();
     }
 
     private void makeApiCallforUserRecent(String userId) {
         Call<InstagramResponseObj> response = ApiServiceManager.createInstagramApiService()
-                .getInstagramUserRecent(userId,getInstaAuthFromIntent());
+                .getInstagramUserRecent(userId, getInstaAuthFromIntent());
         response.enqueue(new Callback<InstagramResponseObj>() {
             @Override
             public void onResponse(Call<InstagramResponseObj> call, Response<InstagramResponseObj> response) {
                 List<Object> instagramList = new ArrayList<Object>();
-                for (InstagramResponseObj.InstagramData data : response.body().getInstagramData()){
+                for (InstagramResponseObj.InstagramData data : response.body().getInstagramData()) {
                     instagramList.add(data);
                 }
                 newsFeedObjectLists.add(instagramList);
@@ -587,38 +656,40 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         });
     }
 
-    private String getInstaAuthFromIntent(){
+    private String getInstaAuthFromIntent() {
         return getIntent().getStringExtra(Constants.INSTAGRAM_OAUTH_INTENTKEY);
     }
 
-    private String getInstaCodeFromIntent(){
+    private String getInstaCodeFromIntent() {
         return getIntent().getStringExtra(Constants.INSTAGRAM_CODE_INTENTKEY);
     }
 
     // -------------- LINKEDIN --------------------//
 
-    private void handleLinkedInApi(){
+    private void handleLinkedInApi() {
         makeLinkedInApiRequest(getLinkedInApiHelper());
     }
 
-    private APIHelper getLinkedInApiHelper(){
+    private APIHelper getLinkedInApiHelper() {
         return APIHelper.getInstance(getApplicationContext());
     }
 
-    private void makeLinkedInApiRequest(APIHelper apiHelper){
-        apiHelper.getRequest(this, Constants.LINKEDIN_BASIC_URL,getLinkedInApiListener(Constants.LINKEDIN_BASIC_URL));
-        apiHelper.getRequest(this, Constants.LINKEDIN_DETAIL_URL,getLinkedInApiListener(Constants.LINKEDIN_DETAIL_URL));
+    private void makeLinkedInApiRequest(APIHelper apiHelper) {
+        apiHelper.getRequest(this, Constants.LINKEDIN_BASIC_URL, getLinkedInApiListener(Constants.LINKEDIN_BASIC_URL));
+        apiHelper.getRequest(this, Constants.LINKEDIN_DETAIL_URL, getLinkedInApiListener(Constants.LINKEDIN_DETAIL_URL));
     }
 
-    private ApiListener getLinkedInApiListener(final String url){
+    private ApiListener getLinkedInApiListener(final String url) {
         return new ApiListener() {
             @Override
             public void onApiSuccess(ApiResponse apiResponse) {
                 Log.i(TAG, "onApiSuccess: LinkedIn ");
                 try {
-                    if (url.equals(Constants.LINKEDIN_BASIC_URL))setLinkedInData(apiResponse.getResponseDataAsJson());
-                    if (url.equals(Constants.LINKEDIN_DETAIL_URL))setLinkedInImage(apiResponse.getResponseDataAsJson());
-                }catch (Exception e){
+                    if (url.equals(Constants.LINKEDIN_BASIC_URL))
+                        setLinkedInData(apiResponse.getResponseDataAsJson());
+                    if (url.equals(Constants.LINKEDIN_DETAIL_URL))
+                        setLinkedInImage(apiResponse.getResponseDataAsJson());
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -630,39 +701,40 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         };
     }
 
-    private void setLinkedInData(JSONObject json){
-        try{
+    private void setLinkedInData(JSONObject json) {
+        try {
             Log.i(TAG, "setLinkedInData: " + json.get("firstName").toString());
             Log.i(TAG, "setLinkedInData: " + json.get("headline").toString());
 //            Object object = json.get("siteStandardProfileRequest");
             Log.i(TAG, "setLinkedInData: " + json.get("siteStandardProfileRequest").toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setLinkedInImage(JSONObject json){
-        try{
+    private void setLinkedInImage(JSONObject json) {
+        try {
             Log.i(TAG, "setLinkedInData: " + json.get("pictureUrl").toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     // ----------------- TWITTER ------------------ //
 
-    private void handleTwitterApi(){
+    private void handleTwitterApi() {
         StatusesService statusService = Twitter.getInstance().getApiClient().getStatusesService();
-        statusService.homeTimeline(null,null,null,null,null,null,null).enqueue(new Callback<List<Tweet>>() {
+        statusService.homeTimeline(null, null, null, null, null, null, null).enqueue(new Callback<List<Tweet>>() {
             @Override
             public void onResponse(Call<List<Tweet>> call, Response<List<Tweet>> response) {
                 final List<Object> tweetList = new ArrayList<>();
-                for (Tweet tweet : response.body()){
+                for (Tweet tweet : response.body()) {
                     tweetList.add(tweet);
                 }
                 newsFeedObjectLists.add(tweetList);
                 updateNewsFeed();
             }
+
             @Override
             public void onFailure(Call<List<Tweet>> call, Throwable t) {
                 t.printStackTrace();
@@ -673,44 +745,70 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     /**
      * Get boolean values of selected filters and set the visibility of images
      */
-    private void storeCheckedButtons(){
+    private void storeCheckedButtons() {
         checkedMap = new HashMap<>();
-        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY,false));
-        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY,false));
-        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY,false));
-        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.LINKEDIN_CHECK_INTENTKEY,false));
-        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.INSTAGRAM_CHECK_INTENTKEY,false));
-        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY,getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY,false));
+        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.LINKEDIN_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.INSTAGRAM_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
 
-        if(checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))youtubeButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+            youtubeButton.setVisibility(View.VISIBLE);
         else youtubeButton.setVisibility(View.GONE);
-        if(checkedMap.get(Constants.PINTEREST_CHECK_INTENTKEY)) pinterestButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.PINTEREST_CHECK_INTENTKEY))
+            pinterestButton.setVisibility(View.VISIBLE);
         else pinterestButton.setVisibility(View.GONE);
-        if(checkedMap.get(Constants.FACEBOOK_CHECK_INTENTKEY)) facebookButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.FACEBOOK_CHECK_INTENTKEY))
+            facebookButton.setVisibility(View.VISIBLE);
         else facebookButton.setVisibility(View.GONE);
-        if(checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY)) linkedinButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY))
+            linkedinButton.setVisibility(View.VISIBLE);
         else linkedinButton.setVisibility(View.GONE);
-        if(checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY)) instagramButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY))
+            instagramButton.setVisibility(View.VISIBLE);
         else instagramButton.setVisibility(View.GONE);
-        if(checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY)) twitterButton.setVisibility(View.VISIBLE);
+        if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY))
+            twitterButton.setVisibility(View.VISIBLE);
         else twitterButton.setVisibility(View.GONE);
     }
 
-    private void startShareIntent(String url){
-        Intent i=new Intent(android.content.Intent.ACTION_SEND);
+    private void startShareIntent(String url) {
+        Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("text/plain");
-        i.putExtra(android.content.Intent.EXTRA_SUBJECT,"Check out this search!");
-        i.putExtra(android.content.Intent.EXTRA_TEXT, url);
-        startActivity(Intent.createChooser(i,"Share via"));
+        i.putExtra(Intent.EXTRA_SUBJECT, "Check out this search!");
+        i.putExtra(Intent.EXTRA_TEXT, url);
+        startActivity(Intent.createChooser(i, "Share via"));
     }
 
-    private void hideKeyboard(){
+    private void showSearchPreview(String url) {
+        previewContainerFrame = (FrameLayout)findViewById(R.id.preview_container_frame);
+        FrameLayout previewContainerCover = (FrameLayout)findViewById(R.id.preview_container_cover);
+        previewContainerCover.setOnClickListener(this);
+        previewContainerFrame.setVisibility(View.VISIBLE);
+//        previewContainer.setVisibility(View.VISIBLE);
+//        previewContainerFrame.setOnTouchListener(this);
+        previewContainerCover.setOnTouchListener(this);
+//        previewContainer.setOnTouchListener(this);
+        Bundle bundle = new Bundle();
+        bundle.putString("url", url);
+        SearchPreviewFragment previewFragment = new SearchPreviewFragment();
+        previewFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.preview_container, previewFragment);
+        fragmentTransaction.commit();
+
+    }
+
+    private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
     }
 
-    private boolean isKeyboardOpen(){
+    private boolean isKeyboardOpen() {
         final LinearLayout rootLayout = (LinearLayout) findViewById(R.id.activity_dash_board);
         rootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -720,7 +818,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 int screenHeight = rootLayout.getRootView().getHeight();
                 int keypadHeight = screenHeight - rect.bottom;
                 Log.i(TAG, "onGlobalLayout: keypad height " + keypadHeight);
-                if (keypadHeight>screenHeight*0.15) isKeyboardOpen = true;
+                if (keypadHeight > screenHeight * 0.15) isKeyboardOpen = true;
                 else isKeyboardOpen = false;
             }
         });
@@ -728,10 +826,10 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     }
 
 
-    private void logKeyHash(){
+    private void logKeyHash() {
         PackageInfo info;
         try {
-            info = getPackageManager().getPackageInfo("com.facebookapittest", PackageManager.GET_SIGNATURES);
+            info = getPackageManager().getPackageInfo("getsterr.getsterr", PackageManager.GET_SIGNATURES);
             for (Signature signature : info.signatures) {
                 MessageDigest md;
                 md = MessageDigest.getInstance("SHA");
@@ -749,4 +847,39 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("DashBoard Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
 }
