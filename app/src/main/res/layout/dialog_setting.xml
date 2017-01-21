@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent" android:background="@color/colorPrimary"
+    android:layout_height="300dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/settings_preview_prompt"
+        android:layout_marginBottom="50dp"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:text="Settings"/>
+    <TextView
+        android:id="@+id/settings_preview_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="View Preview of Web Searches"
+        android:textSize="15sp"
+        android:textColor="@color/colorAccent"
+        android:layout_above="@+id/settings_preview_switch"/>
+    <Switch
+        android:id="@+id/settings_preview_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:checked="true"
+        android:layout_centerInParent="true"/>
+    <Button
+        android:id="@+id/settings_save_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/settings_preview_switch"
+        android:layout_margin="50dp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:background="@color/colorAccent"
+        android:text="Save Changes"/>
+
+</RelativeLayout>

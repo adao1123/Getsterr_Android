@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import getsterr.getsterr.R;
+import getsterr.getsterr.activities.dashboard.DashBoardActivity;
 import getsterr.getsterr.activities.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -25,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
             splashLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                 }
             });
             int secondsDelayed = 1;
@@ -33,7 +34,7 @@ public class SplashActivity extends AppCompatActivity {
 
             new Handler().postDelayed(new Runnable() {
                 public void run() {
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                     finish();
                 }
             }, secondsDelayed * 5000);
@@ -41,7 +42,7 @@ public class SplashActivity extends AppCompatActivity {
             splashLoaded = true;
         }
         else {
-            Intent goToFacebookActivity = new Intent(SplashActivity.this, MainActivity.class);
+            Intent goToFacebookActivity = new Intent(SplashActivity.this, DashBoardActivity.class);
             goToFacebookActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(goToFacebookActivity);
             finish();

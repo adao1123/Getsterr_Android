@@ -1,17 +1,19 @@
 package getsterr.getsterr.activities.dashboard;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Paint;
 import android.graphics.Rect;
-import android.icu.util.BuddhistCalendar;
+import android.graphics.Typeface;
 import android.net.Uri;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -26,13 +29,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.facebook.AccessToken;
@@ -54,15 +60,8 @@ import com.pinterest.android.pdk.PDKException;
 import com.pinterest.android.pdk.PDKPin;
 import com.pinterest.android.pdk.PDKResponse;
 import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.TwitterException;
-import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.models.Tweet;
 import com.twitter.sdk.android.core.services.StatusesService;
-import com.twitter.sdk.android.tweetui.CollectionTimeline;
-import com.twitter.sdk.android.tweetui.TimelineResult;
-import com.twitter.sdk.android.tweetui.TwitterListTimeline;
-import com.twitter.sdk.android.tweetui.UserTimeline;
 
 import org.json.JSONObject;
 
@@ -116,16 +115,27 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     String query;
     FrameLayout previewContainer;
     EditText dashSearchEditText;
+    TextView webSearchButton;
+    TextView imageSearchButton;
+    TextView videoSearchButton;
     boolean isKeyboardOpen;
+    private boolean isSettingInit = false;
+    private boolean isPreviewOpen = false;
+    private boolean isPreviewEnabled = true; //save to preferences
+    float startX;
     FrameLayout previewContainerFrame;
+    LinearLayout searchOptionBar;
     DashBoardRVAdapter dashBoardRVAdapter;
     List<List<Object>> newsFeedObjectLists = new ArrayList<>();
     ArrayList<Object> socialMediaItemList = new ArrayList<>();
     List<Object> searchItemList = new ArrayList<>();
+    SwipeRefreshLayout swipeRefreshContainer;
+    LinearLayout menuHamburgerLayout;
+    Dialog settingDialog;
     private static final int viewSize = 66;    private static final int boundary = 35;
     private float dx;
     private int width;
-
+    private String selectedUrl;
     private PDKResponse myPinsResponse;
     private boolean loading = false;
     private static final String PIN_FIELDS = "id,link,creator,image,counts,note,created_at,board,metadata";
@@ -144,7 +154,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         initViews();
         initActionBar();
         displayRv(socialMediaItemList);
-
+        handleSearchOptions();
         // Setup search bar
         storeCheckedButtons();
         setSearchEditTextListener();
@@ -155,20 +165,87 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        swipeRefreshContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                newsFeedObjectLists.clear();
+                displayNewsFeed();
+                swipeRefreshContainer.setRefreshing(false);
+            }
+        });
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.menu_hamburger_iv:
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginIntent);
+                if (menuHamburgerLayout.getVisibility()==View.GONE) menuHamburgerLayout.setVisibility(View.VISIBLE);
+                else menuHamburgerLayout.setVisibility(View.GONE);
                 break;
             case R.id.menu_logo_iv:
                 newsFeedObjectLists.clear();
                 displayNewsFeed();
                 break;
+            case R.id.menu_login_tv:
+                Intent loginIntent = new Intent(this, LoginActivity.class);
+                startActivity(loginIntent);
+                break;
+            case R.id.menu_setup_tv:
+                Intent setUpIntent = new Intent(this, MainActivity.class);
+                startActivity(setUpIntent);
+                break;
+            case R.id.menu_settings_tv:
+                openSetting();
+                break;
             case R.id.preview_container_cover:
+                previewContainerFrame.setVisibility(View.GONE);
+                isPreviewOpen = false;
+                Intent intent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                intent.putExtra(Constants.URL_INTENTKEY, selectedUrl);
+                startActivity(intent);
+                break;
+            case R.id.search_option_web:
+                webSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                webSearchButton.setTypeface(null,Typeface.BOLD);
+                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                imageSearchButton.setTypeface(Typeface.DEFAULT);
+                imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                videoSearchButton.setTypeface(Typeface.DEFAULT);
+                videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                searchItemList.clear();
+                makeBingApiCall(dashSearchEditText.getText().toString(), 0);
+                break;
+            case R.id.search_option_image:
+                imageSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                imageSearchButton.setTypeface(null,Typeface.BOLD);
+                imageSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                webSearchButton.setTypeface(Typeface.DEFAULT);
+                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                videoSearchButton.setTypeface(Typeface.DEFAULT);
+                videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                makeBingImageApiCall(dashSearchEditText.getText().toString(), 0);
+                break;
+            case R.id.search_option_video:
+                videoSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                videoSearchButton.setTypeface(null,Typeface.BOLD);
+                videoSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                imageSearchButton.setTypeface(Typeface.DEFAULT);
+                imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                webSearchButton.setTypeface(Typeface.DEFAULT);
+                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                makeBingVideoApiCall(dashSearchEditText.getText().toString(), 0);
+                break;
+            case R.id.settings_preview_switch:
+                isPreviewEnabled = !isPreviewEnabled;
+                break;
+            case R.id.settings_save_button:
+                settingDialog.cancel();
                 break;
         }
     }
@@ -180,8 +257,15 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      */
     @Override
     public void onCardClick(String cardUrl) {
-        showSearchPreview(cardUrl);
-
+        selectedUrl = cardUrl;
+        if (isPreviewEnabled) showSearchPreview(cardUrl);
+        else {
+            previewContainer.setVisibility(View.GONE);
+            Intent intent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+            intent.putExtra(Constants.URL_INTENTKEY, cardUrl);
+            startActivity(intent);
+        }
+//        handleFlickableDialog(cardUrl);
     }
 
     @Override
@@ -219,18 +303,25 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         }
     }
 
-
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()){
             case MotionEvent.ACTION_DOWN:
+                Log.i(TAG, "onTouch: action down");
                 dx = view.getX() - motionEvent.getRawX();
+                startX =view.getX();
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log.i(TAG, "onTouch: action move");
 //                if (motionEvent.getRawX()+dx >= width-convertDpToPx(boundary+viewSize)) return true; //sets boundaries
 //                if (motionEvent.getRawX()+dx <= convertDpToPx(boundary)) return true; //sets boundaries
 //                view.animate().x(motionEvent.getRawX()+dx).setDuration(0).start();
                 previewContainerFrame.animate().x(motionEvent.getRawX()+dx).setDuration(0).start();
+                break;
+            case MotionEvent.ACTION_UP:
+                Log.i(TAG, "onTouch: button release");
+                if (motionEvent.getX()>getScreenWidth()*3/4) Log.i(TAG, "onTouch: past 3/4 screen");
+                previewContainerFrame.animate().x(startX).setDuration(0).start();
                 break;
             default:
                 return false;
@@ -238,6 +329,14 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+        if (isPreviewOpen) {
+            previewContainerFrame.setVisibility(View.GONE);
+            isPreviewOpen = false;
+        }
+        else super.onBackPressed();
+    }
 
     /**
      * Coverts the input dp and returns px
@@ -247,7 +346,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     private float convertDpToPx(int dp){
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getBaseContext().getResources().getDisplayMetrics());
     }
-
 
     private void initViews() {
         dashBoardRecyclerView = (RecyclerView) findViewById(R.id.dashbard_recyclerView);
@@ -260,6 +358,11 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         youtubeButton = (ImageButton) findViewById(R.id.dash_youtube_button);
         instagramButton = (ImageButton) findViewById(R.id.dash_instagram_button);
         dashSearchEditText = (EditText) findViewById(R.id.dash_search_editText);
+        webSearchButton = (TextView)findViewById(R.id.search_option_web);
+        imageSearchButton = (TextView)findViewById(R.id.search_option_image);
+        videoSearchButton = (TextView)findViewById(R.id.search_option_video);
+        searchOptionBar = (LinearLayout) findViewById(R.id.search_options_bar);
+        swipeRefreshContainer = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_container);
     }
 
     private void initActionBar() {
@@ -271,6 +374,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         LayoutInflater inflater = LayoutInflater.from(this);
         View actionBarView = inflater.inflate(R.layout.actionbar_layout, null);
         TextView toolbarTitleTv = (TextView) actionBarView.findViewById(R.id.menu_title_tv);
+        menuHamburgerLayout = (LinearLayout)findViewById(R.id.menu_hamburger_container);
+        TextView menuLoginTv = (TextView)findViewById(R.id.menu_login_tv);
+        TextView menuSetupTv = (TextView)findViewById(R.id.menu_setup_tv);
+        TextView menuSettingsTv = (TextView)findViewById(R.id.menu_settings_tv);
+        menuLoginTv.setOnClickListener(this);
+        menuSetupTv.setOnClickListener(this);
+        menuSettingsTv.setOnClickListener(this);
         toolbarTitleTv.setText("Dashboard");
         mainActionBar.setCustomView(actionBarView);
         mainActionBar.setDisplayShowCustomEnabled(true);
@@ -329,6 +439,13 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         displayRv(searchList);
     }
 
+    private void handleSearchOptions(){
+        webSearchButton.setOnClickListener(this);
+        videoSearchButton.setOnClickListener(this);
+        imageSearchButton.setOnClickListener(this);
+        webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+    }
+
     /**
      * Perform Bing API Search when search icon is clicked
      */
@@ -359,7 +476,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_GO) {
                     Log.i(TAG, "onKey: enter clicked");
-                    makeBingApiCall(dashSearchEditText.getText().toString(), 0); //TODO: CHANGE BACK TO makeBingSearchCall ONCE UI IS IMPLEMENTED
+                    makeBingApiCall(dashSearchEditText.getText().toString(), 0);
+                    searchOptionBar.setVisibility(View.VISIBLE);
 //                    makeYoutubeApiCall(dashSearchEditText.getText().toString());
                     return true;
                 }
@@ -783,14 +901,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     }
 
     private void showSearchPreview(String url) {
+        isPreviewOpen = true;
         previewContainerFrame = (FrameLayout)findViewById(R.id.preview_container_frame);
         FrameLayout previewContainerCover = (FrameLayout)findViewById(R.id.preview_container_cover);
         previewContainerCover.setOnClickListener(this);
         previewContainerFrame.setVisibility(View.VISIBLE);
-//        previewContainer.setVisibility(View.VISIBLE);
-//        previewContainerFrame.setOnTouchListener(this);
-        previewContainerCover.setOnTouchListener(this);
-//        previewContainer.setOnTouchListener(this);
+//        previewContainerCover.setOnTouchListener(this);
         Bundle bundle = new Bundle();
         bundle.putString("url", url);
         SearchPreviewFragment previewFragment = new SearchPreviewFragment();
@@ -825,6 +941,15 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         return isKeyboardOpen;
     }
 
+    /**
+     * Gets the size of the user's screen, returns int of the screen width
+     * @return
+     */
+    private int getScreenWidth(){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        return displayMetrics.widthPixels;
+    }
 
     private void logKeyHash() {
         PackageInfo info;
@@ -845,6 +970,24 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         } catch (Exception e) {
             Log.e("exception", e.toString());
         }
+    }
+
+    //--------------------Settings Dialog--------------------//
+
+    private void initDialog(){
+        settingDialog = new Dialog(this);
+        settingDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        settingDialog.setContentView(R.layout.dialog_setting);
+        Switch settingsPreviewSwitch = (Switch) settingDialog.findViewById(R.id.settings_preview_switch);
+        settingsPreviewSwitch.setOnClickListener(this);
+        Button settingSaveButton = (Button)settingDialog.findViewById(R.id.settings_save_button);
+        settingSaveButton.setOnClickListener(this);
+        isSettingInit = true;
+    }
+
+    private void openSetting(){
+        if (!isSettingInit) initDialog();
+        settingDialog.show();
     }
 
     /**

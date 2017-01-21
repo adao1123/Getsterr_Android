@@ -4,6 +4,9 @@ apply plugin: 'io.fabric'
 repositories {
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }
+//    maven {
+//        url "https://jitpack.io"
+//    }
 }
 
 android {
@@ -67,4 +70,5 @@ dependencies {
     compile project(':linkedin-sdk')
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
-}
+//    compile 'com.github.t-kurimura:flickabledialog:3bc3b82ef1'
+ }

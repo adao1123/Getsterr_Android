@@ -73,8 +73,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initSDK();
-        setContentView(R.layout.activity_login);
-        initSaveButton();
+        setContentView(R.layout.activity_login_updated);
+//        initSaveButton();
         initLinkedinLoginButton();
         initTwitterLoginButton();
         initPinterestLoginButton();
@@ -107,15 +107,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.instagram_login_button:
                 onInstagramLogin();
                 break;
-            case R.id.login_save_button:
-                goBackToMainActivity();
-                break;
+//            case R.id.login_save_button:
+//                goBackToMainActivity();
+//                break;
         }
     }
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
+        goBackToMainActivity();
+        super.onBackPressed();
     }
 
     private void goBackToMainActivity(){
@@ -171,8 +172,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.d(TAG, "onCreate: Twitter token "+token);
                 isTwitterLoggedIn = true;
                 Toast.makeText(LoginActivity.this, "Logged into Twitter", Toast.LENGTH_SHORT).show();
-                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_twitter);
-                relativeLayout.setBackgroundResource(R.color.twitter);
+//                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_twitter);
+//                relativeLayout.setBackgroundResource(R.color.twitter);
             }
             @Override
             public void failure(TwitterException exception) {
@@ -197,8 +198,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         facebookLoginButton.setReadPermissions(Arrays.asList("email", "user_posts","user_photos","public_profile","user_about_me"));
         callbackManager = CallbackManager.Factory.create();
         isFacebookLoggedIn = AccessToken.getCurrentAccessToken()!=null;
-        RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_facebook);
-        relativeLayout.setBackgroundResource(R.color.facebook);
+//        RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_facebook);
+//        relativeLayout.setBackgroundResource(R.color.facebook);
         facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -207,8 +208,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.i(TAG, "onSuccess: " + loginResult.getAccessToken().getUserId());
                 Log.i(TAG, "onSuccess: " + AccessToken.getCurrentAccessToken().getUserId());
                 Toast.makeText(LoginActivity.this, "Logged into Facebook", Toast.LENGTH_SHORT).show();
-                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_facebook);
-                relativeLayout.setBackgroundResource(R.color.facebook);
+//                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_facebook);
+//                relativeLayout.setBackgroundResource(R.color.facebook);
             }
 
             @Override
@@ -241,8 +242,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(LoginActivity.this, "Logged into Pinterest", Toast.LENGTH_SHORT).show();
 //                pinterestLoginButton.setText("Logged Into Pinterest");
                 pinterestLoginButton.setBackgroundResource(R.drawable.pinterest_logout);
-                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_pinterest);
-                relativeLayout.setBackgroundResource(R.color.pinterest);
+//                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_pinterest);
+//                relativeLayout.setBackgroundResource(R.color.pinterest);
             }
 
             @Override
@@ -267,8 +268,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(LoginActivity.this, "Logged into LinkedIn", Toast.LENGTH_SHORT).show();
                 isLinkedInLoggedIn = true;
                 Log.d(TAG, "onAuthSuccess: LINKEDIN SUCCESS  ");
-                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_linkedin);
-                relativeLayout.setBackgroundResource(R.color.linkedin);
+//                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_linkedin);
+//                relativeLayout.setBackgroundResource(R.color.linkedin);
             }
 
             @Override
@@ -313,8 +314,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Button instagramLoginButton = (Button)findViewById(R.id.instagram_login_button);
 //                    instagramLoginButton.setText("Logged Into Instagram");
                     isInstagramLoggedIn = true;
-                    RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_instagram);
-                    relativeLayout.setBackgroundResource(R.color.instagram);
+//                    RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_instagram);
+//                    relativeLayout.setBackgroundResource(R.color.instagram);
                     Toast.makeText(LoginActivity.this, "Logged into Instagram", Toast.LENGTH_SHORT).show();
                 }else{
                     try {
