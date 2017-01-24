@@ -20,6 +20,13 @@ public class Constants {
     public static final String INSTAGRAM_LOGGEDIN_INTENTKEY = "isInstagramLoggedIn";
     public static final String TWITTER_LOGGEDIN_INTENTKEY = "isTwitterLoggedIn";
 
+    public static final String FACEBOOK_HOME_URL = "https://facebook.com";
+    public static final String INSTAGRAM_HOME_URL = "https://instagram.com";
+    public static final String TWITTER_HOME_URL = "https://twitter.com";
+    public static final String PINTEREST_HOME_URL = "https://pinterest.com";
+    public static final String YOUTUBE_HOME_URL = "https://youtube.com";
+    public static final String LINKEDIN_HOME_URL = "https://linkedin.com";
+
     public static final String LINKEDIN_CLIENT_ID = "86wh2tth3lu42k";
     public static final String LINKEDIN_CLIENT_SECRET = "48M8VkxasjXiImwh";
     public static final String LINKEDIN_BASIC_URL = "https://api.linkedin.com/v1/people/~";

@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -153,6 +154,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         logKeyHash();
         initViews();
         initActionBar();
+        setSocialMediaButtonListeners();
         displayRv(socialMediaItemList);
         handleSearchOptions();
         // Setup search bar
@@ -246,6 +248,36 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.settings_save_button:
                 settingDialog.cancel();
+                break;
+            case R.id.dash_facebook_button:
+                Intent facebookIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                facebookIntent.putExtra(Constants.URL_INTENTKEY, Constants.FACEBOOK_HOME_URL);
+                startActivity(facebookIntent);
+                break;
+            case R.id.dash_twitter_button:
+                Intent twitterIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                twitterIntent.putExtra(Constants.URL_INTENTKEY, Constants.TWITTER_HOME_URL);
+                startActivity(twitterIntent);
+                break;
+            case R.id.dash_instagram_button:
+                Intent instagramIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                instagramIntent.putExtra(Constants.URL_INTENTKEY, Constants.INSTAGRAM_HOME_URL);
+                startActivity(instagramIntent);
+                break;
+            case R.id.dash_youtube_button:
+                Intent youtubeIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                youtubeIntent.putExtra(Constants.URL_INTENTKEY, Constants.YOUTUBE_HOME_URL);
+                startActivity(youtubeIntent);
+                break;
+            case R.id.dash_linkedin_button:
+                Intent linkedInIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                linkedInIntent.putExtra(Constants.URL_INTENTKEY, Constants.LINKEDIN_HOME_URL);
+                startActivity(linkedInIntent);
+                break;
+            case R.id.dash_pinterest_button:
+                Intent pinterestIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                pinterestIntent.putExtra(Constants.URL_INTENTKEY, Constants.PINTEREST_HOME_URL);
+                startActivity(pinterestIntent);
                 break;
         }
     }
@@ -388,6 +420,15 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         loginButton.setOnClickListener(this);
         ImageView iconButton = (ImageView) actionBarView.findViewById(R.id.menu_logo_iv);
         iconButton.setOnClickListener(this);
+    }
+
+    private void setSocialMediaButtonListeners(){
+        facebookButton.setOnClickListener(this);
+        instagramButton.setOnClickListener(this);
+        twitterButton.setOnClickListener(this);
+        pinterestButton.setOnClickListener(this);
+        youtubeButton.setOnClickListener(this);
+        linkedinButton.setOnClickListener(this);
     }
 
     private void displayRv(List<Object> list) {
@@ -873,23 +914,23 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
 
         if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
-            youtubeButton.setVisibility(View.VISIBLE);
-        else youtubeButton.setVisibility(View.GONE);
+            youtubeButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.youtube),PorterDuff.Mode.SRC_ATOP);
+        else youtubeButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
         if (checkedMap.get(Constants.PINTEREST_CHECK_INTENTKEY))
-            pinterestButton.setVisibility(View.VISIBLE);
-        else pinterestButton.setVisibility(View.GONE);
+            pinterestButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.pinterest),PorterDuff.Mode.SRC_ATOP);
+        else pinterestButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
         if (checkedMap.get(Constants.FACEBOOK_CHECK_INTENTKEY))
-            facebookButton.setVisibility(View.VISIBLE);
-        else facebookButton.setVisibility(View.GONE);
+            facebookButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.facebook),PorterDuff.Mode.SRC_ATOP);
+        else facebookButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
         if (checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY))
-            linkedinButton.setVisibility(View.VISIBLE);
-        else linkedinButton.setVisibility(View.GONE);
+            linkedinButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.linkedin),PorterDuff.Mode.SRC_ATOP);
+        else linkedinButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
         if (checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY))
-            instagramButton.setVisibility(View.VISIBLE);
-        else instagramButton.setVisibility(View.GONE);
+            instagramButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.instagram),PorterDuff.Mode.SRC_ATOP);
+        else instagramButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
         if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY))
-            twitterButton.setVisibility(View.VISIBLE);
-        else twitterButton.setVisibility(View.GONE);
+            twitterButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.twitter),PorterDuff.Mode.SRC_ATOP);
+        else twitterButton.getBackground().setColorFilter(ContextCompat.getColor(this,R.color.colorAccentLight),PorterDuff.Mode.SRC_ATOP);
     }
 
     private void startShareIntent(String url) {

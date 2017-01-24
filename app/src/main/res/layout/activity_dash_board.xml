@@ -102,7 +102,6 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:backgroundTint="@color/facebook"
                 android:adjustViewBounds="true"
                 android:src="@drawable/ic_facebook"
                 android:padding="10dp"
@@ -122,7 +121,7 @@
             android:backgroundTint="@color/twitter"
             android:background="@drawable/roundcorner"
             android:src="@drawable/ic_twitter"
-            android:visibility="gone"/>
+            />
 
         <Space
             android:layout_width="0dp"
@@ -139,7 +138,7 @@
             android:scaleType="fitXY"
             android:background="@drawable/roundcorner"
             android:src="@drawable/pinterest_white"
-            android:visibility="gone"/>
+            />
 
         <Space
             android:layout_width="0dp"
@@ -154,7 +153,7 @@
             android:backgroundTint="@color/linkedin"
             android:background="@drawable/roundcorner"
             android:src="@drawable/ic_linkedin"
-            android:visibility="gone"/>
+            />
 
         <Space
             android:layout_width="0dp"
@@ -169,7 +168,7 @@
             android:backgroundTint="@color/youtube"
             android:background="@drawable/roundcorner"
             android:src="@drawable/ic_youtube"
-            android:visibility="gone"/>
+            />
 
         <Space
             android:layout_width="0dp"
@@ -184,7 +183,7 @@
             android:backgroundTint="@color/instagram"
             android:background="@drawable/roundcorner"
             android:src="@drawable/ic_instagram"
-            android:visibility="gone"/>
+            />
         <Space
             android:layout_width="0dp"
             android:layout_height="1dp"
