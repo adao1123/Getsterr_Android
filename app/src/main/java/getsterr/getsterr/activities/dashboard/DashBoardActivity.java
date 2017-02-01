@@ -474,8 +474,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         if (youtubeList.size() <= bingList.size()) minSize = youtubeList.size();
         else minSize = bingList.size();
         for (int index = 0; index < minSize; index++) {
-            searchList.add((Value) bingList.get(index));
-            searchList.add((YoutubeObject.Resource) youtubeList.get(index));
+            searchList.add( bingList.get(index));
+            searchList.add( youtubeList.get(index));
         }
         displayRv(searchList);
     }
@@ -601,8 +601,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                             searchItemList.add(val);
                         }
                         if (offset > 0) updateSearchRv();
-                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
-                            makeYoutubeApiCall(query, searchItemList);
+//                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+//                            makeYoutubeApiCall(query, searchItemList);
                         else displayRv(searchItemList);
                     }
                 });
@@ -643,8 +643,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                             searchItemList.add(val);
                         }
                         if (offset > 0) updateSearchRv();
-                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
-                            makeYoutubeApiCall(query, searchItemList);
+//                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
+//                            makeYoutubeApiCall(query, searchItemList);
                         else displayRv(searchItemList);
                     }
                 });
