@@ -170,7 +170,6 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_alignParentBottom="true"
         android:background="@drawable/rounded_button"
-        android:backgroundTint="@color/colorPrimaryDark"
         android:textSize="15dp"
         android:textColor="@color/white"
         android:text="Next"/>

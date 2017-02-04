@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         initSDK();
         setContentView(R.layout.activity_login_updated);
-//        initSaveButton();
+        initSaveButton();
         initLinkedinLoginButton();
         initTwitterLoginButton();
         initPinterestLoginButton();
@@ -110,9 +110,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.instagram_login_button:
                 onInstagramLogin();
                 break;
-//            case R.id.login_save_button:
-//                goBackToMainActivity();
-//                break;
+            case R.id.login_save_button:
+                goBackToMainActivity();
+                break;
         }
     }
 
