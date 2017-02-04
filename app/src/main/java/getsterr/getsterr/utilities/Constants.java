@@ -7,12 +7,20 @@ package getsterr.getsterr.utilities;
 public class Constants {
 
     public static final String URL_INTENTKEY = "url";
+    public static final String TITLE_INTENTKEY = "title";
+    public static final String CHECKED_SP = "checked_SP";
     public static final String YOUTUBE_CHECK_INTENTKEY = "isYoutubeChecked";
     public static final String PINTEREST_CHECK_INTENTKEY = "isPinterestChecked";
     public static final String FACEBOOK_CHECK_INTENTKEY = "isFacebookChecked";
     public static final String LINKEDIN_CHECK_INTENTKEY = "isLinkedInChecked";
     public static final String INSTAGRAM_CHECK_INTENTKEY = "isInstagramChecked";
     public static final String TWITTER_CHECK_INTENTKEY = "isTwitterChecked";
+    public static final String YOUTUBE_CHECK_SPKEY = "isYoutubeChecked";
+    public static final String PINTEREST_CHECK_SPKEY = "isPinterestChecked";
+    public static final String FACEBOOK_CHECK_SPKEY = "isFacebookChecked";
+    public static final String LINKEDIN_CHECK_SPKEY = "isLinkedInChecked";
+    public static final String INSTAGRAM_CHECK_SPKEY = "isInstagramChecked";
+    public static final String TWITTER_CHECK_SPKEY = "isTwitterChecked";
     public static final String YOUTUBE_LOGGEDIN_INTENTKEY = "isYoutubeLoggedIn";
     public static final String PINTEREST_LOGGEDIN_INTENTKEY = "isPinterestLoggedIn";
     public static final String FACEBOOK_LOGGEDIN_INTENTKEY = "isFacebookLoggedIn";

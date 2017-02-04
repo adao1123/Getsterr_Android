@@ -1,6 +1,8 @@
 package getsterr.getsterr.activities.main;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -140,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.main_next_button:
+                saveCheckedButtonSP();
                 goToDashBoardActivity();
                 break;
             case R.id.menu_hamburger_iv:
@@ -172,6 +175,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra(Constants.INSTAGRAM_OAUTH_INTENTKEY,getInstaAuthFromIntent());
         intent.putExtra(Constants.INSTAGRAM_CODE_INTENTKEY,getInstaCodeFromIntent());
         startActivityForResult(intent, 40);
+    }
+
+    private void saveCheckedButtonSP(){
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.CHECKED_SP,Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(Constants.YOUTUBE_CHECK_SPKEY,youtubeChecked);
+        editor.putBoolean(Constants.PINTEREST_CHECK_SPKEY,pinterestChecked);
+        editor.putBoolean(Constants.FACEBOOK_CHECK_SPKEY,facebookChecked);
+        editor.putBoolean(Constants.LINKEDIN_CHECK_SPKEY,linkedinChecked);
+        editor.putBoolean(Constants.INSTAGRAM_CHECK_SPKEY,instagramChecked);
+        editor.putBoolean(Constants.TWITTER_CHECK_SPKEY,twitterChecked);
+        editor.commit();
     }
 
     private void initActionBar(){

@@ -2,7 +2,9 @@ package getsterr.getsterr.activities.dashboard;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -10,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -41,6 +44,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
@@ -254,31 +258,37 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             case R.id.dash_facebook_button:
                 Intent facebookIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 facebookIntent.putExtra(Constants.URL_INTENTKEY, Constants.FACEBOOK_HOME_URL);
+                facebookIntent.putExtra(Constants.TITLE_INTENTKEY, "Facebook");
                 startActivity(facebookIntent);
                 break;
             case R.id.dash_twitter_button:
                 Intent twitterIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 twitterIntent.putExtra(Constants.URL_INTENTKEY, Constants.TWITTER_HOME_URL);
+                twitterIntent.putExtra(Constants.TITLE_INTENTKEY, "Twitter");
                 startActivity(twitterIntent);
                 break;
             case R.id.dash_instagram_button:
                 Intent instagramIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 instagramIntent.putExtra(Constants.URL_INTENTKEY, Constants.INSTAGRAM_HOME_URL);
+                instagramIntent.putExtra(Constants.TITLE_INTENTKEY, "Instagram");
                 startActivity(instagramIntent);
                 break;
             case R.id.dash_youtube_button:
                 Intent youtubeIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 youtubeIntent.putExtra(Constants.URL_INTENTKEY, Constants.YOUTUBE_HOME_URL);
+                youtubeIntent.putExtra(Constants.TITLE_INTENTKEY, "Youtube");
                 startActivity(youtubeIntent);
                 break;
             case R.id.dash_linkedin_button:
                 Intent linkedInIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 linkedInIntent.putExtra(Constants.URL_INTENTKEY, Constants.LINKEDIN_HOME_URL);
+                linkedInIntent.putExtra(Constants.TITLE_INTENTKEY, "LinkedIn");
                 startActivity(linkedInIntent);
                 break;
             case R.id.dash_pinterest_button:
                 Intent pinterestIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
                 pinterestIntent.putExtra(Constants.URL_INTENTKEY, Constants.PINTEREST_HOME_URL);
+                pinterestIntent.putExtra(Constants.TITLE_INTENTKEY, "Pinterest");
                 startActivity(pinterestIntent);
                 break;
         }
@@ -478,11 +488,18 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         int minSize;
         if (youtubeList.size() <= bingList.size()) minSize = youtubeList.size();
         else minSize = bingList.size();
-        for (int index = 0; index < minSize; index++) {
-            searchList.add( bingList.get(index));
-            searchList.add( youtubeList.get(index));
+        if (youtubeList.size()<=0&&bingList.size()<=0) {
+            Toast.makeText(this,"No Results Found", Toast.LENGTH_SHORT).show();
+            return;
         }
-        displayRv(searchList);
+        if (youtubeList.size()<=0) displayRv(bingList);
+        else {
+            for (int index = 0; index < minSize; index++) {
+                searchList.add( bingList.get(index));
+                searchList.add( youtubeList.get(index));
+            }
+            displayRv(searchList);
+        }
     }
 
     private void handleSearchOptions(){
@@ -541,7 +558,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             @Override
             public void onResponse(Call<YoutubeObject> call, Response<YoutubeObject> response) {
                 YoutubeObject youtubeObject = response.body();
-                Log.i(TAG, "onResponse: " + youtubeObject.getItems()[0].getId().getVideoId());
+//                Log.i(TAG, "onResponse: " + youtubeObject.getItems()[0].getId().getVideoId());
                 List<Object> youtubeList = new ArrayList<Object>();
                 for (YoutubeObject.Resource resource : response.body().getItems())
                     youtubeList.add(resource);
@@ -606,6 +623,10 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         for (Value val : bingResults.getWebPages().getValue()) {
                             searchItemList.add(val);
                         }
+                        if (searchItemList.size()<=0){
+                            Toast.makeText(DashBoardActivity.this,"No Results Found", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         if (offset > 0) updateSearchRv();
 //                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
 //                            makeYoutubeApiCall(query, searchItemList);
@@ -647,6 +668,10 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                         if (offset == 0) searchItemList.clear();
                         for (BingImageResult.BingImageObj val : bingResults.getValue()) {
                             searchItemList.add(val);
+                        }
+                        if (searchItemList.size()<=0){
+                            Toast.makeText(DashBoardActivity.this,"No Results Found", Toast.LENGTH_SHORT).show();
+                            return;
                         }
                         if (offset > 0) updateSearchRv();
 //                        else if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
@@ -911,13 +936,20 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      * Get boolean values of selected filters and set the visibility of images
      */
     private void storeCheckedButtons() {
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.CHECKED_SP,Context.MODE_PRIVATE);
         checkedMap = new HashMap<>();
-        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY, false));
-        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
-        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY, false));
-        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.LINKEDIN_CHECK_INTENTKEY, false));
-        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.INSTAGRAM_CHECK_INTENTKEY, false));
-        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, sharedPreferences.getBoolean(Constants.YOUTUBE_CHECK_SPKEY,false));
+        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.PINTEREST_CHECK_SPKEY,false));
+        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.FACEBOOK_CHECK_SPKEY,false));
+        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.LINKEDIN_CHECK_SPKEY,false));
+        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.INSTAGRAM_CHECK_SPKEY,false));
+        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.TWITTER_CHECK_SPKEY,false));
+//        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY, false));
+//        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
+//        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY, false));
+//        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.LINKEDIN_CHECK_INTENTKEY, false));
+//        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.INSTAGRAM_CHECK_INTENTKEY, false));
+//        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
 
         if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
             youtubeButton.setBackgroundResource(R.drawable.circle_youtube_color);
