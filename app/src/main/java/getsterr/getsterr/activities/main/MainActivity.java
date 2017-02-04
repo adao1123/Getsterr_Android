@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_setup);
         initActionBar();
         initButtons();
     }
@@ -60,85 +60,84 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.main_youtube_button:
                 if(youtubeChecked == false){
                     Log.d(TAG, "onClick: YOUTUBE CLICKED - FALSE to TRUE");
-                    youtubeImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.youtube), PorterDuff.Mode.SRC_ATOP);
+                    youtubeImageButton.setBackgroundResource(R.drawable.circle_youtube_color);
                     youtubeChecked = true;
                 }else{
                     Log.d(TAG, "onClick: YOUTUBE CLICKED - TRUE to FALSE");
-                    youtubeImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    youtubeImageButton.setBackgroundResource(R.drawable.circle_youtube_grey);
                     youtubeChecked = false;
                 }
-                youtubeImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_pinterest_button:
                 if(pinterestChecked == false){
                     if (!getIsPinterestLoggedIn()) {
                         Toast.makeText(this,"Please Sign In to Pinterest",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
                         return;
                     }
-                    pinterestImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.pinterest), PorterDuff.Mode.SRC_ATOP);
+                    pinterestImageButton.setBackgroundResource(R.drawable.circle_pinterest_color);
                     pinterestChecked = true;
                 }else{
-                    pinterestImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    pinterestImageButton.setBackgroundResource(R.drawable.circle_pinterest_grey);
                     pinterestChecked = false;
                 }
-                pinterestImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_facebook_button:
                 if(facebookChecked == false){
                     if (!getIsFacebookLoggedIn()) {
                         Toast.makeText(this,"Please Sign In to Facebook",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
                         return;
                     }
-                    facebookImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.facebook), PorterDuff.Mode.SRC_ATOP);
+                    facebookImageButton.setBackgroundResource(R.drawable.circle_facebook_color);
                     facebookChecked = true;
                 }else {
-                    facebookImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    facebookImageButton.setBackgroundResource(R.drawable.circle_facebook_grey);
                     facebookChecked = false;
                 }
-                facebookImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_linkedin_button:
                 if(linkedinChecked == false){
                     if (!getIsLinkedInLoggedIn()) {
                         Toast.makeText(this,"Please Sign In to LinkedIn",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
                         return;
                     }
-                    linkedinImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.linkedin), PorterDuff.Mode.SRC_ATOP);
+                    linkedinImageButton.setBackgroundResource(R.drawable.circle_linkedin_color);
                     linkedinChecked = true;
                 }else{
-                    linkedinImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    linkedinImageButton.setBackgroundResource(R.drawable.circle_linkedin_grey);
                     linkedinChecked = false;
                 }
-                linkedinImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_instagram_button:
                 Log.i(TAG, "onClick: " + getInstaAuthFromIntent() + " " + getInstaCodeFromIntent());
                 if(instagramChecked == false){
                     if (!getIsInstagramLoggedIn()) {
                         Toast.makeText(this,"Please Sign In to Instagram",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
                         return;
                     }
-                    instagramImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.instagram), PorterDuff.Mode.SRC_ATOP);
+                    instagramImageButton.setBackgroundResource(R.drawable.circle_instagram_color);
                     instagramChecked = true;
                 }else{
-                    instagramImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    instagramImageButton.setBackgroundResource(R.drawable.circle_instagram_grey);
                     instagramChecked = false;
                 }
-                instagramImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_twitter_button:
                 if(twitterChecked == false){
                     if (!getIsTwitterLoggedIn()) {
                         Toast.makeText(this,"Please Sign In to Twitter",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
                         return;
                     }
-                    twitterImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.twitter), PorterDuff.Mode.SRC_ATOP);
+                    twitterImageButton.setBackgroundResource(R.drawable.circle_twitter_color);
                     twitterChecked = true;
                 }else{
-                    twitterImageButton.getBackground().setColorFilter(ContextCompat.getColor(MainActivity.this, R.color.colorAccentLight), PorterDuff.Mode.SRC_ATOP);
+                    twitterImageButton.setBackgroundResource(R.drawable.circle_twitter_grey);
                     twitterChecked = false;
                 }
-                twitterImageButton.setBackgroundResource(R.drawable.roundcorner);
                 break;
             case R.id.main_next_button:
                 goToDashBoardActivity();
@@ -155,6 +154,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void goToLoginActivity(){
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 
     private void goToDashBoardActivity(){
@@ -187,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initButtons(){
         initViews();
-        initImageButtonColors();
+//        initImageButtonColors();
         initClickListeners();
     }
 

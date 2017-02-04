@@ -35,6 +35,7 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterAuthClient;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 import com.twitter.sdk.android.core.models.Image;
 
@@ -64,10 +65,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             isLinkedInLoggedIn, isPinterestLoggedIn, isTwitterLoggedIn = false;
     private PDKClient pdkClient;
     Button pinterestLoginButton;
+    ImageButton linkedinLoginButton;
+    Button instagramLoginButton;
+    TwitterLoginButton twitterLoginButton;
+    TwitterAuthClient twitterAuthClient;
     String instaAuthToken, instaCode;
     AuthenticationDialog instagramDialog;
-
-    TwitterLoginButton twitterLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //LinkedIn
         LISessionManager.getInstance(getApplicationContext()).onActivityResult(this, requestCode, resultCode, data);
         //Twitter
-        twitterLoginButton.onActivityResult(requestCode, resultCode, data);
+        twitterAuthClient.onActivityResult(requestCode, resultCode, data);
         //Pinterest
         PDKClient.getInstance().onOauthResponse(requestCode, resultCode, data);
         //Facebook
@@ -145,42 +148,72 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Twitter SDK Init
         TwitterAuthConfig authConfig = new TwitterAuthConfig(Constants.TWITTER_KEY, Constants.TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
+        twitterAuthClient = new TwitterAuthClient();
     }
 
     private void initInstagramLoginButton(){
-        Button instagramLoginButton = (Button)findViewById(R.id.instagram_login_button);
+        instagramLoginButton = (Button)findViewById(R.id.instagram_login_button);
         instagramLoginButton.setOnClickListener(this);
     }
 
     private void initLinkedinLoginButton(){
-        ImageButton linkedinLoginButton = (ImageButton) findViewById(R.id.linkedin_login_button);
+        linkedinLoginButton = (ImageButton) findViewById(R.id.linkedin_login_button);
         linkedinLoginButton.setOnClickListener(this);
     }
 
     private void initTwitterLoginButton(){
-        // Twitter Stuff
-        twitterLoginButton = (TwitterLoginButton)findViewById(R.id.twitter_login_button);
-        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+        final ImageButton twitterLoginButtonCustom = (ImageButton) findViewById(R.id.twitter_login_button);
+        twitterLoginButtonCustom.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void success(Result<TwitterSession> result) {
-                Log.d(TAG, "success: TWITTER LOGIN SUCCESSFUL");
-                TwitterSession session = Twitter.getSessionManager().getActiveSession();
-                TwitterAuthToken authToken = session.getAuthToken();
-                Log.i(TAG, "Twitter success: username " + session.getUserName());
-                String token = authToken.token;
-                String secret = authToken.secret;
-                Log.d(TAG, "onCreate: Twitter token "+token);
-                isTwitterLoggedIn = true;
-                Toast.makeText(LoginActivity.this, "Logged into Twitter", Toast.LENGTH_SHORT).show();
-//                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_twitter);
-//                relativeLayout.setBackgroundResource(R.color.twitter);
-            }
-            @Override
-            public void failure(TwitterException exception) {
-                exception.printStackTrace();
+            public void onClick(View view) {
+                twitterAuthClient.authorize(LoginActivity.this, new Callback<TwitterSession>() {
+                    @Override
+                    public void success(Result<TwitterSession> result) {
+                        Log.d(TAG, "success: TWITTER LOGIN SUCCESSFUL");
+                        TwitterSession session = Twitter.getSessionManager().getActiveSession();
+                        TwitterAuthToken authToken = session.getAuthToken();
+                        Log.i(TAG, "Twitter success: username " + session.getUserName());
+                        String token = authToken.token;
+                        String secret = authToken.secret;
+                        Log.d(TAG, "onCreate: Twitter token "+token);
+                        isTwitterLoggedIn = true;
+                        Toast.makeText(LoginActivity.this, "Logged into Twitter", Toast.LENGTH_SHORT).show();
+                        twitterLoginButtonCustom.setBackgroundResource(R.drawable.logout_twitter);
+                    }
+
+                    @Override
+                    public void failure(TwitterException exception) {
+                        exception.printStackTrace();
+                    }
+                });
             }
         });
     }
+
+//    private void initTwitterLoginButton(){
+//        // Twitter Stuff
+//        twitterLoginButton = (TwitterLoginButton)findViewById(R.id.twitter_login_button);
+//        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+//            @Override
+//            public void success(Result<TwitterSession> result) {
+//                Log.d(TAG, "success: TWITTER LOGIN SUCCESSFUL");
+//                TwitterSession session = Twitter.getSessionManager().getActiveSession();
+//                TwitterAuthToken authToken = session.getAuthToken();
+//                Log.i(TAG, "Twitter success: username " + session.getUserName());
+//                String token = authToken.token;
+//                String secret = authToken.secret;
+//                Log.d(TAG, "onCreate: Twitter token "+token);
+//                isTwitterLoggedIn = true;
+//                Toast.makeText(LoginActivity.this, "Logged into Twitter", Toast.LENGTH_SHORT).show();
+////                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_twitter);
+////                relativeLayout.setBackgroundResource(R.color.twitter);
+//            }
+//            @Override
+//            public void failure(TwitterException exception) {
+//                exception.printStackTrace();
+//            }
+//        });
+//    }
 
     private void initPinterestLoginButton(){
         pinterestLoginButton = (Button)findViewById(R.id.pinterst_login_button);
@@ -241,7 +274,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 isPinterestLoggedIn = true;
                 Toast.makeText(LoginActivity.this, "Logged into Pinterest", Toast.LENGTH_SHORT).show();
 //                pinterestLoginButton.setText("Logged Into Pinterest");
-                pinterestLoginButton.setBackgroundResource(R.drawable.pinterest_logout);
+                pinterestLoginButton.setBackgroundResource(R.drawable.logout_pinterest);
 //                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_pinterest);
 //                relativeLayout.setBackgroundResource(R.color.pinterest);
             }
@@ -268,6 +301,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(LoginActivity.this, "Logged into LinkedIn", Toast.LENGTH_SHORT).show();
                 isLinkedInLoggedIn = true;
                 Log.d(TAG, "onAuthSuccess: LINKEDIN SUCCESS  ");
+                linkedinLoginButton.setBackgroundResource(R.drawable.logout_linkedin);
 //                RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_linkedin);
 //                relativeLayout.setBackgroundResource(R.color.linkedin);
             }
@@ -311,8 +345,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     instaAuthToken = authToken;
                     instaCode = code;
                     instagramDialog.dismiss();
-                    Button instagramLoginButton = (Button)findViewById(R.id.instagram_login_button);
-//                    instagramLoginButton.setText("Logged Into Instagram");
+                    instagramLoginButton.setBackgroundResource(R.drawable.logout_instagram);
                     isInstagramLoggedIn = true;
 //                    RelativeLayout relativeLayout = (RelativeLayout)findViewById(R.id.login_frame_instagram);
 //                    relativeLayout.setBackgroundResource(R.color.instagram);
