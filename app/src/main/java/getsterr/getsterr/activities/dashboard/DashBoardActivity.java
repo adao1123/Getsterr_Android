@@ -112,7 +112,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     RecyclerView dashBoardRecyclerView;
 
-    ImageButton twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton, facebookButton;
+    ImageButton snapchatButton, twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton, facebookButton;
     Toolbar dashBoardToolbar;
     ActionBar dashBoardActionBar;
     Map<String, Boolean> checkedMap;
@@ -291,6 +291,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 pinterestIntent.putExtra(Constants.TITLE_INTENTKEY, "Pinterest");
                 startActivity(pinterestIntent);
                 break;
+            case R.id.dash_snapchat_button:
+                Intent snapchatIntent = new Intent(DashBoardActivity.this, WebViewActivity.class);
+                snapchatIntent.putExtra(Constants.URL_INTENTKEY, Constants.SNAPCHAT_HOME_URL);
+                snapchatIntent.putExtra(Constants.TITLE_INTENTKEY, "SnapChat");
+                startActivity(snapchatIntent);
+                break;
         }
     }
 
@@ -400,6 +406,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         previewContainer = (FrameLayout) findViewById(R.id.preview_container);
         facebookButton = (ImageButton) findViewById(R.id.dash_facebook_button);
         twitterButton = (ImageButton) findViewById(R.id.dash_twitter_button);
+        snapchatButton = (ImageButton) findViewById(R.id.dash_snapchat_button);
         pinterestButton = (ImageButton) findViewById(R.id.dash_pinterest_button);
         linkedinButton = (ImageButton) findViewById(R.id.dash_linkedin_button);
         youtubeButton = (ImageButton) findViewById(R.id.dash_youtube_button);
@@ -441,6 +448,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         facebookButton.setOnClickListener(this);
         instagramButton.setOnClickListener(this);
         twitterButton.setOnClickListener(this);
+        snapchatButton.setOnClickListener(this);
         pinterestButton.setOnClickListener(this);
         youtubeButton.setOnClickListener(this);
         linkedinButton.setOnClickListener(this);
@@ -944,6 +952,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.LINKEDIN_CHECK_SPKEY,false));
         checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.INSTAGRAM_CHECK_SPKEY,false));
         checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.TWITTER_CHECK_SPKEY,false));
+        checkedMap.put(Constants.SNAPCHAT_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.SNAPCHAT_CHECK_SPKEY,false));
 //        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY, false));
 //        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
 //        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY, false));
@@ -969,6 +978,9 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY))
             twitterButton.setBackgroundResource(R.drawable.circle_twitter_color);
         else twitterButton.setBackgroundResource(R.drawable.circle_twitter_grey);
+        if (checkedMap.get(Constants.SNAPCHAT_CHECK_INTENTKEY))
+            snapchatButton.setBackgroundResource(R.drawable.circle_snapchat_color);
+        else snapchatButton.setBackgroundResource(R.drawable.circle_snapchat_grey);
     }
 
     private void startShareIntent(String url) {

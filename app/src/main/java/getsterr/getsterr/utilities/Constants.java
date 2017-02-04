@@ -15,23 +15,27 @@ public class Constants {
     public static final String LINKEDIN_CHECK_INTENTKEY = "isLinkedInChecked";
     public static final String INSTAGRAM_CHECK_INTENTKEY = "isInstagramChecked";
     public static final String TWITTER_CHECK_INTENTKEY = "isTwitterChecked";
+    public static final String SNAPCHAT_CHECK_INTENTKEY = "isSnapchatChecked";
     public static final String YOUTUBE_CHECK_SPKEY = "isYoutubeChecked";
     public static final String PINTEREST_CHECK_SPKEY = "isPinterestChecked";
     public static final String FACEBOOK_CHECK_SPKEY = "isFacebookChecked";
     public static final String LINKEDIN_CHECK_SPKEY = "isLinkedInChecked";
     public static final String INSTAGRAM_CHECK_SPKEY = "isInstagramChecked";
     public static final String TWITTER_CHECK_SPKEY = "isTwitterChecked";
+    public static final String SNAPCHAT_CHECK_SPKEY = "isSnapchatChecked";
     public static final String YOUTUBE_LOGGEDIN_INTENTKEY = "isYoutubeLoggedIn";
     public static final String PINTEREST_LOGGEDIN_INTENTKEY = "isPinterestLoggedIn";
     public static final String FACEBOOK_LOGGEDIN_INTENTKEY = "isFacebookLoggedIn";
     public static final String LINKEDIN_LOGGEDIN_INTENTKEY = "isLinkedInLoggedIn";
     public static final String INSTAGRAM_LOGGEDIN_INTENTKEY = "isInstagramLoggedIn";
     public static final String TWITTER_LOGGEDIN_INTENTKEY = "isTwitterLoggedIn";
+    public static final String SNAPCHAT_LOGGEDIN_INTENTKEY = "isTwitterLoggedIn";
 
     public static final String FACEBOOK_HOME_URL = "https://facebook.com";
     public static final String INSTAGRAM_HOME_URL = "https://instagram.com";
     public static final String TWITTER_HOME_URL = "https://twitter.com";
     public static final String PINTEREST_HOME_URL = "https://pinterest.com";
+    public static final String SNAPCHAT_HOME_URL = "https://snapchat.com";
     public static final String YOUTUBE_HOME_URL = "https://youtube.com";
     public static final String LINKEDIN_HOME_URL = "https://linkedin.com";
 

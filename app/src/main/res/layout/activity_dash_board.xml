@@ -72,7 +72,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="5dp"
-        android:weightSum="7"
+        android:weightSum="8"
         android:background="@color/colorAccentLight">
 
         <Space
@@ -87,24 +87,6 @@
             android:layout_height="30dp"
             android:background="@drawable/circle_facebook_grey"
             />
-        <!--<FrameLayout-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:layout_margin="5dp"-->
-            <!--android:background="@drawable/roundcorner"-->
-            <!--android:backgroundTint="@color/facebook"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:id="@+id/dash_facebook_button">-->
-            <!--<ImageButton-->
-                <!--android:id="@+id/dash_social_facebook_button"-->
-                <!--android:layout_width="20dp"-->
-                <!--android:layout_height="20dp"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:adjustViewBounds="true"-->
-                <!--android:src="@drawable/ic_facebook"-->
-                <!--android:padding="10dp"-->
-                <!--/>-->
-        <!--</FrameLayout>-->
 
         <Space
             android:layout_width="0dp"
@@ -130,6 +112,19 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:background="@drawable/circle_pinterest_grey"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" >
+        </Space>
+
+        <ImageButton
+            android:id="@+id/dash_snapchat_button"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/circle_snapchat_grey"
             />
 
         <Space

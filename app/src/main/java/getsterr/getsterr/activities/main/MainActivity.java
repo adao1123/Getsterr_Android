@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     boolean linkedinChecked = false;
     boolean instagramChecked = false;
     boolean twitterChecked = false;
+    boolean snapchatChecked = false;
 
     Button nextButton;
     ImageButton youtubeImageButton;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ImageButton linkedinImageButton;
     ImageButton instagramImageButton;
     ImageButton twitterImageButton;
+    ImageButton snapchatImageButton;
 
     Toolbar mainToolbar;
     ActionBar mainActionBar;
@@ -141,6 +143,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     twitterChecked = false;
                 }
                 break;
+            case R.id.main_snapchat_button:
+                if(snapchatChecked == false){
+                    if (!getIsSnapchatLoggedIn()) {
+                        Toast.makeText(this,"Please Sign In to Snapchat",Toast.LENGTH_SHORT).show();
+                        goToLoginActivity();
+                        return;
+                    }
+                    snapchatImageButton.setBackgroundResource(R.drawable.circle_snapchat_color);
+                    snapchatChecked = true;
+                }else{
+                    snapchatImageButton.setBackgroundResource(R.drawable.circle_snapchat_grey);
+                    snapchatChecked = false;
+                }
+                break;
             case R.id.main_next_button:
                 saveCheckedButtonSP();
                 goToDashBoardActivity();
@@ -186,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putBoolean(Constants.LINKEDIN_CHECK_SPKEY,linkedinChecked);
         editor.putBoolean(Constants.INSTAGRAM_CHECK_SPKEY,instagramChecked);
         editor.putBoolean(Constants.TWITTER_CHECK_SPKEY,twitterChecked);
+        editor.putBoolean(Constants.SNAPCHAT_CHECK_SPKEY,snapchatChecked);
         editor.commit();
     }
 
@@ -217,6 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         linkedinImageButton = (ImageButton)findViewById(R.id.main_linkedin_button);
         instagramImageButton = (ImageButton)findViewById(R.id.main_instagram_button);
         twitterImageButton = (ImageButton)findViewById(R.id.main_twitter_button);
+        snapchatImageButton = (ImageButton)findViewById(R.id.main_snapchat_button);
         nextButton = (Button)findViewById(R.id.main_next_button);
     }
 
@@ -236,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         linkedinImageButton.setOnClickListener(this);
         instagramImageButton.setOnClickListener(this);
         twitterImageButton.setOnClickListener(this);
+        snapchatImageButton.setOnClickListener(this);
         nextButton.setOnClickListener(this);
     }
 
@@ -261,6 +280,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private boolean getIsTwitterLoggedIn(){
         return getIntent().getBooleanExtra(Constants.TWITTER_LOGGEDIN_INTENTKEY,false);
+    }
+    private boolean getIsSnapchatLoggedIn(){
+        return true;
     }
 
 }
