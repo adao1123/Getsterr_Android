@@ -203,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editor.putBoolean(Constants.INSTAGRAM_CHECK_SPKEY,instagramChecked);
         editor.putBoolean(Constants.TWITTER_CHECK_SPKEY,twitterChecked);
         editor.putBoolean(Constants.SNAPCHAT_CHECK_SPKEY,snapchatChecked);
+        editor.putString(Constants.INSTAGRAM_OAUTH_INTENTKEY,getInstaAuthFromIntent());
         editor.commit();
     }
 

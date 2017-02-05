@@ -117,12 +117,14 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     ActionBar dashBoardActionBar;
     Map<String, Boolean> checkedMap;
     String query;
+    String instagramAuthString;
     FrameLayout previewContainer;
     EditText dashSearchEditText;
     TextView webSearchButton;
     TextView imageSearchButton;
     TextView videoSearchButton;
     boolean isKeyboardOpen;
+    private boolean isSearchMode = false;
     private boolean isSettingInit = false;
     private boolean isPreviewOpen = false;
     private boolean isPreviewEnabled = true; //save to preferences
@@ -192,6 +194,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 displayNewsFeed();
                 swipeRefreshContainer.setEnabled(true);
                 searchOptionBar.setVisibility(View.GONE);
+                isSearchMode = false;
                 break;
             case R.id.menu_login_tv:
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -384,11 +387,19 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onBackPressed() {
+
         if (isPreviewOpen) {
             previewContainerFrame.setVisibility(View.GONE);
             isPreviewOpen = false;
         }
-        else super.onBackPressed();
+        else if (isSearchMode){
+            newsFeedObjectLists.clear();
+            displayNewsFeed();
+            swipeRefreshContainer.setEnabled(true);
+            searchOptionBar.setVisibility(View.GONE);
+            isSearchMode = false;
+//            super.onBackPressed();
+        }
     }
 
     /**
@@ -550,6 +561,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                     makeBingApiCall(dashSearchEditText.getText().toString(), 0);
                     searchOptionBar.setVisibility(View.VISIBLE);
                     swipeRefreshContainer.setEnabled(false);
+                    isSearchMode = true;
 //                    makeYoutubeApiCall(dashSearchEditText.getText().toString());
                     return true;
                 }
@@ -818,7 +830,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     private void makeApiCallforUserRecent(String userId) {
         Call<InstagramResponseObj> response = ApiServiceManager.createInstagramApiService()
-                .getInstagramUserRecent(userId, getInstaAuthFromIntent());
+                .getInstagramUserRecent(userId, instagramAuthString);
         response.enqueue(new Callback<InstagramResponseObj>() {
             @Override
             public void onResponse(Call<InstagramResponseObj> call, Response<InstagramResponseObj> response) {
@@ -840,7 +852,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 
     private void makeApiCallforUserInfo() {
         Call<InstagramUserResponse> call = ApiServiceManager.createInstagramApiService()
-                .getInstagramUserInfo(getInstaAuthFromIntent());
+                .getInstagramUserInfo(instagramAuthString);
         call.enqueue(new Callback<InstagramUserResponse>() {
             @Override
             public void onResponse(Call<InstagramUserResponse> call, Response<InstagramUserResponse> response) {
@@ -945,6 +957,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
      */
     private void storeCheckedButtons() {
         SharedPreferences sharedPreferences = getSharedPreferences(Constants.CHECKED_SP,Context.MODE_PRIVATE);
+        instagramAuthString = sharedPreferences.getString(Constants.INSTAGRAM_OAUTH_INTENTKEY,null);
         checkedMap = new HashMap<>();
         checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, sharedPreferences.getBoolean(Constants.YOUTUBE_CHECK_SPKEY,false));
         checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.PINTEREST_CHECK_SPKEY,false));
@@ -972,7 +985,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         if (checkedMap.get(Constants.LINKEDIN_CHECK_INTENTKEY))
             linkedinButton.setBackgroundResource(R.drawable.circle_linkedin_color);
         else linkedinButton.setBackgroundResource(R.drawable.circle_linkedin_grey);
-        if (checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY))
+        if (checkedMap.get(Constants.INSTAGRAM_CHECK_INTENTKEY)&&instagramAuthString!=null)
             instagramButton.setBackgroundResource(R.drawable.circle_instagram_color);
         else instagramButton.setBackgroundResource(R.drawable.circle_instagram_grey);
         if (checkedMap.get(Constants.TWITTER_CHECK_INTENTKEY))
