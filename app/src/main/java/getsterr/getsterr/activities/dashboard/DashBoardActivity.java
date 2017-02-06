@@ -960,18 +960,18 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         instagramAuthString = sharedPreferences.getString(Constants.INSTAGRAM_OAUTH_INTENTKEY,null);
         checkedMap = new HashMap<>();
         checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, sharedPreferences.getBoolean(Constants.YOUTUBE_CHECK_SPKEY,false));
-        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.PINTEREST_CHECK_SPKEY,false));
+//        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.PINTEREST_CHECK_SPKEY,false));
         checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.FACEBOOK_CHECK_SPKEY,false));
         checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.LINKEDIN_CHECK_SPKEY,false));
         checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.INSTAGRAM_CHECK_SPKEY,false));
-        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.TWITTER_CHECK_SPKEY,false));
+//        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.TWITTER_CHECK_SPKEY,false));
         checkedMap.put(Constants.SNAPCHAT_CHECK_INTENTKEY,  sharedPreferences.getBoolean(Constants.SNAPCHAT_CHECK_SPKEY,false));
 //        checkedMap.put(Constants.YOUTUBE_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.YOUTUBE_CHECK_INTENTKEY, false));
-//        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.PINTEREST_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.PINTEREST_CHECK_INTENTKEY, false));
 //        checkedMap.put(Constants.FACEBOOK_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.FACEBOOK_CHECK_INTENTKEY, false));
 //        checkedMap.put(Constants.LINKEDIN_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.LINKEDIN_CHECK_INTENTKEY, false));
 //        checkedMap.put(Constants.INSTAGRAM_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.INSTAGRAM_CHECK_INTENTKEY, false));
-//        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
+        checkedMap.put(Constants.TWITTER_CHECK_INTENTKEY, getIntent().getBooleanExtra(Constants.TWITTER_CHECK_INTENTKEY, false));
 
         if (checkedMap.get(Constants.YOUTUBE_CHECK_INTENTKEY))
             youtubeButton.setBackgroundResource(R.drawable.circle_youtube_color);
