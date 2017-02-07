@@ -2,6 +2,8 @@ package getsterr.getsterr.fragments;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,6 +36,7 @@ public class SearchPreviewFragment extends Fragment implements View.OnClickListe
         View view = inflater.inflate(R.layout.fragment_preview,container,false);
         webView = (WebView)view.findViewById(R.id.WebView);
         progressBar = (ProgressBar)view.findViewById(R.id.webView_progressBar);
+        progressBar.getIndeterminateDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
         clickablePreview = (FrameLayout)view.findViewById(R.id.clickable_preview_screen);
         url = getArguments().getString("url");
         return view;

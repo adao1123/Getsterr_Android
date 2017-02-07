@@ -347,7 +347,7 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         viewHolder.titleTv.setText(bingImageObj.getName());
         viewHolder.descriptionTv.setText(bingImageObj.getHostPageDisplayUrl());
         Picasso.with(context).load(bingImageObj.getThumbnailUrl()).into(viewHolder.thumbnailIv);
-        viewHolder.bind(cardClickListener, bingImageObj.getHostPageDisplayUrl());
+        viewHolder.bind(cardClickListener, bingImageObj.getContentUrl());
         if (position>=cardItems.size()-1) lastResultShownListener.onLastResultShown(position+2,'i');
     }
 

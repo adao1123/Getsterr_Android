@@ -2,6 +2,8 @@ package getsterr.getsterr.utilities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
     private WebView webView;
     private ProgressBar progressBar;
     LinearLayout menuHamburgerLayout;
+    LinearLayout parentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +66,29 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        parentLayout.removeAllViews(); //the viewgroup the webview is attached to
+        webView.loadUrl("about:blank");
+        webView.stopLoading();
+        webView.setWebChromeClient(null);
+        webView.setWebViewClient(null);
+        webView.destroy();
+        webView = null;
+    }
+
     private void initViews(){
         webView = (WebView)findViewById(R.id.WebView);
         progressBar = (ProgressBar)findViewById(R.id.webView_progressBar);
         dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
+        parentLayout = (LinearLayout) findViewById(R.id.activity_web_view);
     }
 
     private String getBundleUrl(){
@@ -103,12 +125,13 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             progressBar.setVisibility(View.VISIBLE);
+            progressBar.getIndeterminateDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
         }
     }
 

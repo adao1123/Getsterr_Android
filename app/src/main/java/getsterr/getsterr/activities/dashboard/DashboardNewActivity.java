@@ -124,6 +124,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
     String query;
     String instagramAuthString;
     FrameLayout previewContainer;
+    FrameLayout parentLayout;
     EditText dashSearchEditText;
     TextView webSearchButton;
     TextView imageSearchButton;
@@ -146,6 +147,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
     private static final int viewSize = 66;    private static final int boundary = 35;
     private float dx;
     private int width;
+    private String currentQuery;
     private String selectedUrl;
     private PDKResponse myPinsResponse;
     private boolean loading = false;
@@ -165,7 +167,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         initViews();
         initActionBar();
         setSocialMediaButtonListeners();
-        displayRv(socialMediaItemList);
+//        displayRv(socialMediaItemList);
         handleSearchOptions();
         // Setup search bar
 //        storeCheckedButtons();
@@ -177,6 +179,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        swipeRefreshContainer.setEnabled(false);
         swipeRefreshContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -230,9 +233,10 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 videoSearchButton.setTypeface(Typeface.DEFAULT);
                 videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
                 searchItemList.clear();
-                makeBingApiCall(dashSearchEditText.getText().toString(), 0);
+                if (currentQuery!= null) makeBingApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_image:
+                parentLayout.requestFocus();
                 imageSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
                 imageSearchButton.setTypeface(null,Typeface.BOLD);
                 imageSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -242,7 +246,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
                 videoSearchButton.setTypeface(Typeface.DEFAULT);
                 videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                makeBingImageApiCall(dashSearchEditText.getText().toString(), 0);
+                if (currentQuery!=null)makeBingImageApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_video:
                 videoSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
@@ -254,7 +258,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
                 webSearchButton.setTypeface(Typeface.DEFAULT);
                 webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                makeBingVideoApiCall(dashSearchEditText.getText().toString(), 0);
+                if (currentQuery!=null)makeBingVideoApiCall(currentQuery, 0);
                 break;
             case R.id.settings_preview_switch:
                 isPreviewEnabled = !isPreviewEnabled;
@@ -399,8 +403,10 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         }
         else if (isSearchMode){
             newsFeedObjectLists.clear();
+            searchItemList.clear();
+            dashBoardRVAdapter.notifyDataSetChanged();
 //            displayNewsFeed();
-            swipeRefreshContainer.setEnabled(true);
+//            swipeRefreshContainer.setEnabled(true);
             searchOptionBar.setVisibility(View.GONE);
             isSearchMode = false;
 //            super.onBackPressed();
@@ -417,6 +423,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
     }
 
     private void initViews() {
+        parentLayout = (FrameLayout) findViewById(R.id.activity_dash_board);
         dashBoardRecyclerView = (RecyclerView) findViewById(R.id.dashbard_recyclerView);
         dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
         previewContainer = (FrameLayout) findViewById(R.id.preview_container);
@@ -525,6 +532,17 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_GO) {
                     Log.i(TAG, "onKey: enter clicked");
+                    webSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    webSearchButton.setTypeface(null,Typeface.BOLD);
+                    webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                    imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                    imageSearchButton.setTypeface(Typeface.DEFAULT);
+                    imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                    videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
+                    videoSearchButton.setTypeface(Typeface.DEFAULT);
+                    videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                    searchItemList.clear();
+                    currentQuery = dashSearchEditText.getText().toString();
                     makeBingApiCall(dashSearchEditText.getText().toString(), 0);
                     searchOptionBar.setVisibility(View.VISIBLE);
                     swipeRefreshContainer.setEnabled(false);
@@ -545,13 +563,14 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         call.enqueue(new Callback<YoutubeObject>() {
             @Override
             public void onResponse(Call<YoutubeObject> call, Response<YoutubeObject> response) {
-                YoutubeObject youtubeObject = response.body();
+//                YoutubeObject youtubeObject = response.body();
 //                Log.i(TAG, "onResponse: " + youtubeObject.getItems()[0].getId().getVideoId());
                 List<Object> youtubeList = new ArrayList<Object>();
                 for (YoutubeObject.Resource resource : response.body().getItems())
                     youtubeList.add(resource);
 //                displayRv(dataList);
                 combineSearchLists(youtubeList, bingList);
+                Log.i(TAG, "onResponse: in youtube API");
             }
 
             @Override
@@ -583,6 +602,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
+                        makeBingApiCall(enteredQuery,offset);
                     }
 
                     @Override
@@ -615,7 +635,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
 //        String input = dashSearchEditText.getText().toString();
         if (enteredQuery.equals("")) return;
         query = enteredQuery;
-        if (offset == 0) hideKeyboard();
+//        if (offset == 0) hideKeyboard();
         BingAPISearchService.BingImageRx bingSearch = BingAPISearchService.createImageRx();
         Observable<BingImageResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
@@ -660,8 +680,9 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
     private void makeBingVideoApiCall(final String enteredQuery, final int offset) {
 //        String input = dashSearchEditText.getText().toString();
         if (enteredQuery.equals("")) return;
+        Log.i(TAG, "makeBingVideoApiCall: ");
         query = enteredQuery;
-        if (offset == 0) hideKeyboard();
+//        if (offset == 0) hideKeyboard();
         BingAPISearchService.BingVideoRx bingSearch = BingAPISearchService.createVideoRx();
         Observable<BingVideoResult> observable = bingSearch.getBingAPIResult(query, 25, offset, "en-us", "Moderate", Constants.BING_SUBSCRIPTION_KEY);
         observable.subscribeOn(Schedulers.newThread())
@@ -679,7 +700,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
 
                     @Override
                     public void onNext(BingVideoResult bingResults) {
-                        Log.d(TAG, "onNext: BING RESULTS RETURNED");
+                        Log.d(TAG, "onNext: BING VIDEO RESULTS RETURNED");
                         Log.d(TAG, "onNext: " + bingResults.toString());
                         Log.d(TAG, "onNext: " + bingResults.getWebSearchUrl());
 

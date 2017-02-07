@@ -1,294 +1,303 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_dash_board"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context="getsterr.getsterr.activities.dashboard.DashBoardNewActivity">
 
-
-    <android.support.design.widget.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
 
-        app:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/dashboard_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_gravity="top"
-            app:theme="@style/MyActionBarTheme"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-        </android.support.v7.widget.Toolbar>
-
-        <LinearLayout
-            android:id="@+id/menu_hamburger_container"
-            android:orientation="horizontal"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:visibility="gone"
-            android:background="@color/colorPrimary">
-            <TextView
-                android:id="@+id/menu_settings_tv"
+
+            app:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/dashboard_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top"
+                app:theme="@style/MyActionBarTheme"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+            </android.support.v7.widget.Toolbar>
+
+            <LinearLayout
+                android:id="@+id/menu_hamburger_container"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:text="Settings"/>
+                android:paddingBottom="10dp"
+                android:visibility="gone"
+                android:background="@color/colorPrimary">
+                <TextView
+                    android:id="@+id/menu_settings_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_weight="1"
+                    android:text="Settings"/>
+            </LinearLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:orientation="vertical"
+            android:background="@color/colorAccentLight"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="5"
+            android:background="@color/colorAccentLight">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_facebook_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_facebook_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_twitter_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_twitter_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_linkedin_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_linkedin_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_youtube_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_youtube_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
         </LinearLayout>
 
-    </android.support.design.widget.AppBarLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:orientation="vertical"
-        android:background="@color/colorAccentLight"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:weightSum="5"
-        android:background="@color/colorAccentLight">
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_facebook_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_facebook_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_twitter_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_twitter_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_linkedin_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_linkedin_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_youtube_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_youtube_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        android:weightSum="6"
-        android:background="@color/colorAccentLight">
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_outlook_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_outlook_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_gmail_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_gmail_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_yahoo_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_yahoo_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_aol_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_aol_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-        <ImageButton
-            android:id="@+id/dash_zoho_button"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/circle_zoho_color"
-            />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" >
-        </Space>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorAccentLight"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <EditText
-            android:id="@+id/dash_search_editText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/search_edittext"
-            android:drawableRight="@drawable/ic_search_black_24dp"
-            android:imeOptions="actionGo"
-            android:inputType="text"
-            android:hint="Search the web anonymously"
-            />
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:weightSum="6"
+            android:background="@color/colorAccentLight">
 
-    </LinearLayout>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
 
-    <LinearLayout
-        android:id="@+id/search_options_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:padding="5dp"
-        android:orientation="horizontal">
-        <TextView
-            android:id="@+id/search_option_web"
+            <ImageButton
+                android:id="@+id/dash_outlook_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_outlook_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_gmail_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_gmail_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_yahoo_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_yahoo_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_aol_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_aol_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_zoho_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_zoho_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Web"
-            android:textStyle="bold"
-            android:textSize="15sp"
-            android:textColor="@color/colorPrimary"/>
-        <TextView
-            android:id="@+id/search_option_image"
+            android:background="@color/colorAccentLight"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <EditText
+                android:id="@+id/dash_search_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/search_edittext"
+                android:drawableRight="@drawable/ic_search_black_24dp"
+                android:imeOptions="actionGo"
+                android:inputType="text"
+                android:hint="Anonymous search - No tracking"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/search_options_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Image"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#d3d3d3"/>
-        <TextView
-            android:id="@+id/search_option_video"
+            android:visibility="gone"
+            android:padding="5dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/search_option_web"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Web"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/colorPrimary"/>
+            <TextView
+                android:id="@+id/search_option_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Image"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#d3d3d3"/>
+            <TextView
+                android:id="@+id/search_option_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Video"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#d3d3d3"/>
+        </LinearLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Video"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:textColor="#d3d3d3"/>
+            android:layout_height="match_parent">
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/dashbard_recyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </FrameLayout>
+
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/preview_container_frame"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="match_parent">
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/dashbard_recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-        </android.support.v4.widget.SwipeRefreshLayout>
         <FrameLayout
-            android:id="@+id/preview_container_frame"
+            android:id="@+id/preview_container"
             android:layout_width="match_parent"
-            android:visibility="gone"
-            android:layout_height="match_parent">
-            <FrameLayout
-                android:id="@+id/preview_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="30dp"/>
-            <FrameLayout
-                android:id="@+id/preview_container_cover"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="30dp"
-                android:elevation="2dp"/>
-        </FrameLayout>
+            android:layout_height="wrap_content"
+            android:layout_margin="30dp"/>
+        <FrameLayout
+            android:id="@+id/preview_container_cover"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="30dp"
+            android:elevation="2dp"/>
     </FrameLayout>
 
-
-
-</LinearLayout>
+</FrameLayout>
