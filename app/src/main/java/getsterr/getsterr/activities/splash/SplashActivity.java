@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import getsterr.getsterr.R;
 import getsterr.getsterr.activities.dashboard.DashBoardActivity;
+import getsterr.getsterr.activities.dashboard.DashBoardNewActivity;
 import getsterr.getsterr.activities.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
@@ -38,10 +39,12 @@ public class SplashActivity extends AppCompatActivity {
 
             new Handler().postDelayed(new Runnable() {
                 public void run() {
-                    if (isFirstTime()) {
-                        setNotFirstTime();
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                    }else startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
+                    startActivity(new Intent(SplashActivity.this, DashBoardNewActivity.class));
+
+//                    if (isFirstTime()) {
+//                        setNotFirstTime();
+//                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+//                    }else startActivity(new Intent(SplashActivity.this, DashBoardActivity.class));
                     finish();
                 }
             }, secondsDelayed * 1000);
@@ -49,13 +52,14 @@ public class SplashActivity extends AppCompatActivity {
             splashLoaded = true;
         }
         else {
-            Intent goToFacebookActivity;
-            if (isFirstTime()) {
-                setNotFirstTime();
-                goToFacebookActivity = new Intent(SplashActivity.this, MainActivity.class);
-            }else goToFacebookActivity = new Intent(SplashActivity.this, DashBoardActivity.class);
-            goToFacebookActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(goToFacebookActivity);
+            Intent dashboardIntent;
+//            if (isFirstTime()) {
+//                setNotFirstTime();
+//                dashboardIntent = new Intent(SplashActivity.this, MainActivity.class);
+//            }else dashboardIntent = new Intent(SplashActivity.this, DashBoardActivity.class);
+            dashboardIntent = new Intent(SplashActivity.this, DashBoardNewActivity.class);
+            dashboardIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(dashboardIntent);
             finish();
         }
     }

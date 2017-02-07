@@ -38,6 +38,11 @@ public class Constants {
     public static final String SNAPCHAT_HOME_URL = "https://snapchat.com";
     public static final String YOUTUBE_HOME_URL = "https://youtube.com";
     public static final String LINKEDIN_HOME_URL = "https://linkedin.com";
+    public static final String OUTLOOK_HOME_URL = "https://outlook.live.com/";
+    public static final String GMAIL_HOME_URL = "https://www.google.com/gmail/";
+    public static final String YAHOO_HOME_URL = "https://mail.yahoo.com/";
+    public static final String AOL_HOME_URL = "https://mail.aol.com/";
+    public static final String ZOHO_HOME_URL = "https://www.zoho.com/mail/";
 
     //TODO Currently not using Linkedin in functionality, but might need to request publish key when app implements LinkedIn and is ready to publish
     public static final String LINKEDIN_CLIENT_ID = "86wh2tth3lu42k";
