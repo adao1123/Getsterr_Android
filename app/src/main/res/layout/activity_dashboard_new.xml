@@ -194,7 +194,7 @@
                 android:id="@+id/dash_zoho_button"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/circle_zoho_color"
+                android:background="@drawable/circle_zoohoo_color"
                 />
 
             <Space
@@ -220,7 +220,7 @@
                 android:drawableRight="@drawable/ic_search_black_24dp"
                 android:imeOptions="actionGo"
                 android:inputType="text"
-                android:hint="Anonymous search - No tracking"
+                android:hint="browse and search anonymously"
                 />
 
         </LinearLayout>
