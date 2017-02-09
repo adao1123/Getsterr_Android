@@ -28,7 +28,7 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
     Toolbar dashBoardToolbar;
     private WebView webView;
     private ProgressBar progressBar;
-    LinearLayout menuHamburgerLayout;
+//    LinearLayout menuHamburgerLayout;
     LinearLayout parentLayout;
 
     @Override
@@ -45,21 +45,21 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.menu_hamburger_iv:
-                if (menuHamburgerLayout.getVisibility()==View.GONE) menuHamburgerLayout.setVisibility(View.VISIBLE);
-                else menuHamburgerLayout.setVisibility(View.GONE);
-                break;
+//            case R.id.menu_hamburger_iv:
+//                if (menuHamburgerLayout.getVisibility()==View.GONE) menuHamburgerLayout.setVisibility(View.VISIBLE);
+//                else menuHamburgerLayout.setVisibility(View.GONE);
+//                break;
             case R.id.menu_logo_iv:
                 this.finish();
                 break;
-            case R.id.menu_login_tv:
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginIntent);
-                break;
-            case R.id.menu_setup_tv:
-                Intent setUpIntent = new Intent(this, MainActivity.class);
-                startActivity(setUpIntent);
-                break;
+//            case R.id.menu_login_tv:
+//                Intent loginIntent = new Intent(this, LoginActivity.class);
+//                startActivity(loginIntent);
+//                break;
+//            case R.id.menu_setup_tv:
+//                Intent setUpIntent = new Intent(this, MainActivity.class);
+//                startActivity(setUpIntent);
+//                break;
             case R.id.menu_settings_tv:
 //                openSetting();
                 break;
@@ -144,17 +144,18 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         LayoutInflater inflater = LayoutInflater.from(this);
         View actionBarView = inflater.inflate(R.layout.actionbar_layout, null);
         TextView toolbarTitleTv = (TextView) actionBarView.findViewById(R.id.menu_title_tv);
-        menuHamburgerLayout = (LinearLayout)findViewById(R.id.menu_hamburger_container);
-        TextView menuLoginTv = (TextView)findViewById(R.id.menu_login_tv);
-        TextView menuSetupTv = (TextView)findViewById(R.id.menu_setup_tv);
-        TextView menuSettingsTv = (TextView)findViewById(R.id.menu_settings_tv);
-        menuLoginTv.setOnClickListener(this);
-        menuSetupTv.setOnClickListener(this);
-        menuSettingsTv.setOnClickListener(this);
+//        menuHamburgerLayout = (LinearLayout)findViewById(R.id.menu_hamburger_container);
+//        TextView menuLoginTv = (TextView)findViewById(R.id.menu_login_tv);
+//        TextView menuSetupTv = (TextView)findViewById(R.id.menu_setup_tv);
+//        TextView menuSettingsTv = (TextView)findViewById(R.id.menu_settings_tv);
+//        menuLoginTv.setOnClickListener(this);
+//        menuSetupTv.setOnClickListener(this);
+//        menuSettingsTv.setOnClickListener(this);
         toolbarTitleTv.setText(getBundleTitle());
         mainActionBar.setCustomView(actionBarView);
         mainActionBar.setDisplayShowCustomEnabled(true);
         ImageView loginButton = (ImageView) actionBarView.findViewById(R.id.menu_hamburger_iv);
+        loginButton.setVisibility(View.GONE);
         loginButton.setOnClickListener(this);
         ImageView iconButton = (ImageView) actionBarView.findViewById(R.id.menu_logo_iv);
         iconButton.setOnClickListener(this);

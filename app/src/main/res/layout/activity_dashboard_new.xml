@@ -251,7 +251,7 @@
                 android:text="Image"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#d3d3d3"/>
+                android:textColor="@color/lightgray"/>
             <TextView
                 android:id="@+id/search_option_video"
                 android:layout_width="match_parent"
@@ -261,7 +261,7 @@
                 android:text="Video"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#d3d3d3"/>
+                android:textColor="@color/lightgray"/>
         </LinearLayout>
 
         <FrameLayout
