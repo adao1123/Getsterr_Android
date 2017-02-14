@@ -16,6 +16,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import getsterr.imf.R;
@@ -49,11 +50,14 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
 //                else menuHamburgerLayout.setVisibility(View.GONE);
 //                break;
             case R.id.menu_logo_iv:
+                startShareAppIntent();
+                break;
+            case R.id.toolbar_icon:
                 this.finish();
                 break;
-            case R.id.menu_share_iv:
-                startShareIntent(url);
-                break;
+//            case R.id.menu_share_iv:
+//                startShareIntent(url);
+//                break;
 //            case R.id.menu_login_tv:
 //                Intent loginIntent = new Intent(this, LoginActivity.class);
 //                startActivity(loginIntent);
@@ -159,11 +163,13 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         ImageView loginButton = (ImageView) actionBarView.findViewById(R.id.menu_hamburger_iv);
         loginButton.setVisibility(View.GONE);
         loginButton.setOnClickListener(this);
-        ImageView iconButton = (ImageView) actionBarView.findViewById(R.id.menu_logo_iv);
-        iconButton.setOnClickListener(this);
-        ImageView shareButton = (ImageView)actionBarView.findViewById(R.id.menu_share_iv);
-        shareButton.setOnClickListener(this);
-        if (!getBundleTitle().equals("Search")) shareButton.setVisibility(View.GONE);
+        ImageView shareAppButton = (ImageView) actionBarView.findViewById(R.id.menu_logo_iv);
+        shareAppButton.setOnClickListener(this);
+        RelativeLayout toolbarIcon = (RelativeLayout) findViewById(R.id.toolbar_icon);
+        toolbarIcon.setOnClickListener(this);
+//        ImageView shareButton = (ImageView)actionBarView.findViewById(R.id.menu_share_iv);
+//        shareButton.setOnClickListener(this);
+//        if (!getBundleTitle().equals("Search")) shareButton.setVisibility(View.GONE);
     }
 
     private void startShareIntent(String url) {
@@ -171,6 +177,14 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         i.setType("text/plain");
         i.putExtra(Intent.EXTRA_SUBJECT, "Check out this Getsterr search!");
         i.putExtra(Intent.EXTRA_TEXT, "I found this on Getsterr - " + url);
+        startActivity(Intent.createChooser(i, "Share via"));
+    }
+
+    private void startShareAppIntent() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(Intent.EXTRA_SUBJECT, "Hey! Get Getsterr!");
+        i.putExtra(Intent.EXTRA_TEXT, "Hey! Get Getsterr! \nhttps://play.google.com/store/apps/details?id=getsterr.imf&ah=02E7Fv-xKVeD-_tcwnyRMeEnxfc");
         startActivity(Intent.createChooser(i, "Share via"));
     }
 

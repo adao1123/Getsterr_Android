@@ -10,6 +10,6 @@ import retrofit2.http.Query;
  */
 
 public interface GiphyApiService {
-    @GET("/v1/gifs/search?api_key=dc6zaTOxFJmzC")
+    @GET("/v1/gifs/search?api_key=dc6zaTOxFJmzC&limit=100")
     Call<GiphyObject> getGiphySearch(@Query("q") String query);
 }

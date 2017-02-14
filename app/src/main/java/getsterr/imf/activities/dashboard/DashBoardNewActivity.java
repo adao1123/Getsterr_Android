@@ -172,11 +172,12 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 else menuHamburgerLayout.setVisibility(View.GONE);
                 break;
             case R.id.menu_logo_iv:
-                newsFeedObjectLists.clear();
-//                displayNewsFeed();
-//                swipeRefreshContainer.setEnabled(true);
-                searchOptionBar.setVisibility(View.GONE);
-                isSearchMode = false;
+                startShareAppIntent();
+//                newsFeedObjectLists.clear();
+////                displayNewsFeed();
+////                swipeRefreshContainer.setEnabled(true);
+//                searchOptionBar.setVisibility(View.GONE);
+//                isSearchMode = false;
                 break;
             case R.id.menu_login_tv:
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -362,6 +363,9 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 break;
             case 'v':
                 makeBingVideoApiCall(query, offset);
+                break;
+            case 'm':
+                makeGiphyApiCall(query,offset);
                 break;
         }
     }
@@ -727,7 +731,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 });
     }
 
-    private void makeGiphyApiCall(String enteredQuery, int offset){
+    private void makeGiphyApiCall(String enteredQuery, final int offset){
         Call<GiphyObject> call = ApiServiceManager.createGiphyApiService().getGiphySearch(enteredQuery);
         call.enqueue(new Callback<GiphyObject>() {
             @Override
@@ -738,7 +742,8 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 for (GiphyObject.Giphy giphy : response.body().getData()){
                     items.add(giphy);
                 }
-                displayGridRv(items);
+                if (offset > 0) updateSearchRv();
+                else displayGridRv(items);
             }
 
             @Override
@@ -779,6 +784,14 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         fragmentTransaction.replace(R.id.preview_container, previewFragment);
         fragmentTransaction.commit();
 
+    }
+
+    private void startShareAppIntent() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(Intent.EXTRA_SUBJECT, "Hey! Get Getsterr!");
+        i.putExtra(Intent.EXTRA_TEXT, "Hey! Get Getsterr! \nhttps://play.google.com/store/apps/details?id=getsterr.imf&ah=02E7Fv-xKVeD-_tcwnyRMeEnxfc");
+        startActivity(Intent.createChooser(i, "Share via"));
     }
 
     private void hideKeyboard() {

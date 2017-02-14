@@ -76,6 +76,8 @@ public class GiphyObject {
         public class GiphyImages{
             private GiphyStill original_still;
             private GiphyFixedHeight fixed_height;
+            private GiphyFixedHeightStill fixed_height_still;
+            private GiphyFixedHeightSmallStill fixed_height_small_still;
 
             public GiphyStill getOriginal_still() {
                 return original_still;
@@ -83,6 +85,14 @@ public class GiphyObject {
 
             public GiphyFixedHeight getFixed_height() {
                 return fixed_height;
+            }
+
+            public GiphyFixedHeightStill getFixed_height_still() {
+                return fixed_height_still;
+            }
+
+            public GiphyFixedHeightSmallStill getFixed_height_small_still() {
+                return fixed_height_small_still;
             }
 
             public class GiphyStill{
@@ -108,6 +118,20 @@ public class GiphyObject {
                 }
             }
             public class GiphyFixedHeight{
+                private String url;
+
+                public String getUrl() {
+                    return url;
+                }
+            }
+            public class GiphyFixedHeightStill{
+                private String url;
+
+                public String getUrl() {
+                    return url;
+                }
+            }
+            public class GiphyFixedHeightSmallStill{
                 private String url;
 
                 public String getUrl() {

@@ -374,9 +374,11 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     private void configureGiphyViewHolder(GiphyViewHolder viewHolder, int position){
         GiphyObject.Giphy giphy = (GiphyObject.Giphy) cardItems.get(position);
         if (giphy.getImages().getOriginal_still()!=null) {
-            Glide.with(context).load(giphy.getImages().getFixed_height().getUrl()).asGif().into(viewHolder.imageView);
+            Glide.with(context).load(giphy.getImages().getFixed_height_small_still().getUrl()).asGif().thumbnail(0.5f).into(viewHolder.imageView);
             Log.i(TAG, "configureGiphyViewHolder: gif url: " + giphy.getImages().getOriginal_still().getUrl());
         }
+        viewHolder.bind(cardClickListener, giphy.getUrl());
+//        if (position>=cardItems.size()-2) lastResultShownListener.onLastResultShown(position+2,'m');
     }
 
     /**
@@ -606,6 +608,14 @@ public class DashBoardRVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public GiphyViewHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.giphy_iv);
+        }
+        public void bind(final CardClickListener listener, final String url){
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onCardClick(url);
+                }
+            });
         }
     }
 

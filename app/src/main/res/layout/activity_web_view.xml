@@ -17,18 +17,30 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/dashboard_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="45dp"
             android:layout_gravity="top"
             app:theme="@style/MyActionBarTheme"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         </android.support.v7.widget.Toolbar>
+        <RelativeLayout
+            android:id="@+id/toolbar_icon"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:background="@color/colorPrimaryRedBright">
+            <ImageView
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:src="@drawable/getsterr_full_red"/>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/menu_hamburger_container"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:visibility="gone"
             android:background="@color/colorPrimary">
