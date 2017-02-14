@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="getsterr.getsterr.activities.login.LoginActivity">
+    tools:context="getsterr.imf.activities.login.LoginActivity">
 
     <LinearLayout
         android:id="@+id/activity_login"

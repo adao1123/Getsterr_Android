@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="getsterr.getsterr.activities.dashboard.DashBoardActivity">
+    tools:context="getsterr.imf.activities.dashboard.DashBoardActivity">
 
 
     <android.support.design.widget.AppBarLayout

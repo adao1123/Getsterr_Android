@@ -13,11 +13,11 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
-        applicationId "getsterr.getsterr"
+        applicationId 'getsterr.imf'
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.4"
+        versionCode 7
+        versionName "1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -30,8 +30,10 @@ android {
     dexOptions {
         javaMaxHeapSize "4g"
     }
-    configurations{
+    configurations {
         all*.exclude module: 'volley'
+    }
+    productFlavors {
     }
 }
 
@@ -50,6 +52,8 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:support-v4:25.0.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
     compile 'io.reactivex:rxjava:1.1.6'
     compile 'io.reactivex:rxandroid:1.2.1'
@@ -70,5 +74,5 @@ dependencies {
     compile project(':linkedin-sdk')
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
-//    compile 'com.github.t-kurimura:flickabledialog:3bc3b82ef1'
- }
+    //    compile 'com.github.t-kurimura:flickabledialog:3bc3b82ef1'
+}

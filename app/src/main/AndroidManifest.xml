@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="getsterr.getsterr">
+    package="getsterr.imf">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -26,14 +26,16 @@
             android:value="439e0dcc6a94e115377d50f92f49f152dec0c9cc" />
 
         <activity
-            android:name=".activities.main.MainActivity"
-            android:screenOrientation="portrait"></activity>
+            android:name="getsterr.imf.activities.main.MainActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
         <activity
-            android:name=".activities.dashboard.DashBoardActivity"
+            android:name="getsterr.imf.activities.dashboard.DashBoardActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity android:name=".utilities.WebViewActivity" />
-        <activity android:name=".activities.login.LoginActivity">
+        <activity android:name="getsterr.imf.utilities.WebViewActivity" />
+        <activity android:name="getsterr.imf.activities.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -60,9 +62,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.youtube.YoutubeDisplayActivity"
+            android:name="getsterr.imf.activities.youtube.YoutubeDisplayActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".activities.splash.SplashActivity">
+        <activity android:name="getsterr.imf.activities.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -77,7 +79,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".activities.dashboard.DashBoardNewActivity"></activity>
+        <activity android:name="getsterr.imf.activities.dashboard.DashBoardNewActivity" android:screenOrientation="portrait">
+
+        </activity>
     </application>
 
 </manifest>

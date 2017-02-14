@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:descendantFocusability="beforeDescendants"
     android:focusableInTouchMode="true"
-    tools:context="getsterr.getsterr.activities.dashboard.DashBoardNewActivity">
+    tools:context="getsterr.imf.activities.dashboard.DashBoardNewActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="5dp"
-            android:weightSum="5"
+            android:weightSum="6"
             android:background="@color/colorAccentLight">
 
             <Space
@@ -114,6 +114,19 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@drawable/circle_youtube_color"
+                />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" >
+            </Space>
+
+            <ImageButton
+                android:id="@+id/dash_instagram_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/circle_instagram_color"
                 />
 
             <Space
@@ -220,7 +233,8 @@
                 android:drawableRight="@drawable/ic_search_black_24dp"
                 android:imeOptions="actionGo"
                 android:inputType="text"
-                android:hint="browse and search anonymously"
+                android:textCursorDrawable="@drawable/cursor_color"
+                android:hint=" browse and search anonymously"
                 />
 
         </LinearLayout>
@@ -259,6 +273,16 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Video"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/lightgray"/>
+            <TextView
+                android:id="@+id/search_option_gif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Meme"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 android:textColor="@color/lightgray"/>
