@@ -38,6 +38,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -123,6 +124,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
     private int width;
     private String currentQuery;
     private String selectedUrl;
+    RelativeLayout giphyPowerByLayout;
     private PDKResponse myPinsResponse;
     private boolean loading = false;
     private static final String PIN_FIELDS = "id,link,creator,image,counts,note,created_at,board,metadata";
@@ -198,6 +200,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 startActivity(intent);
                 break;
             case R.id.search_option_web:
+                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
                 webSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
                 webSearchButton.setTypeface(null,Typeface.BOLD);
                 webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -215,6 +218,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.search_option_image:
                 parentLayout.requestFocus();
+                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
                 imageSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
                 imageSearchButton.setTypeface(null,Typeface.BOLD);
                 imageSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -230,6 +234,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 if (currentQuery!=null)makeBingImageApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_video:
+                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
                 videoSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
                 videoSearchButton.setTypeface(null,Typeface.BOLD);
                 videoSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -258,6 +263,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 videoSearchButton.setTypeface(Typeface.DEFAULT);
                 videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
                 if (currentQuery!=null)makeGiphyApiCall(currentQuery, 0);
+                giphyPowerByLayout.setVisibility(View.VISIBLE);
                 break;
             case R.id.settings_preview_switch:
                 isPreviewEnabled = !isPreviewEnabled;
@@ -448,6 +454,7 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         memeSearchButton = (TextView)findViewById(R.id.search_option_gif);
         searchOptionBar = (LinearLayout) findViewById(R.id.search_options_bar);
         swipeRefreshContainer = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_container);
+        giphyPowerByLayout = (RelativeLayout)findViewById(R.id.giphy_powerby_layout);
     }
 
     private void initActionBar() {
