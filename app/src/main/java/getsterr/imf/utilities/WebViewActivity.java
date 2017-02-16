@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -55,9 +56,9 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.toolbar_icon:
                 this.finish();
                 break;
-//            case R.id.menu_share_iv:
-//                startShareIntent(url);
-//                break;
+            case R.id.web_share_button:
+                startShareIntent(url);
+                break;
 //            case R.id.menu_login_tv:
 //                Intent loginIntent = new Intent(this, LoginActivity.class);
 //                startActivity(loginIntent);
@@ -167,9 +168,9 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         shareAppButton.setOnClickListener(this);
         RelativeLayout toolbarIcon = (RelativeLayout) findViewById(R.id.toolbar_icon);
         toolbarIcon.setOnClickListener(this);
-//        ImageView shareButton = (ImageView)actionBarView.findViewById(R.id.menu_share_iv);
-//        shareButton.setOnClickListener(this);
-//        if (!getBundleTitle().equals("Search")) shareButton.setVisibility(View.GONE);
+        CardView shareButton = (CardView)findViewById(R.id.web_share_button);
+        shareButton.setOnClickListener(this);
+        if (!getBundleTitle().equals("Search")) shareButton.setVisibility(View.GONE);
     }
 
     private void startShareIntent(String url) {

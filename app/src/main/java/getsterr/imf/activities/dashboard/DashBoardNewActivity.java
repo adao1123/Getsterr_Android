@@ -84,56 +84,27 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
 
     private static final String TAG = DashBoardActivity.class.getSimpleName();
 
-    RecyclerView dashBoardRecyclerView;
-
-    ImageButton snapchatButton, twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton, facebookButton;
-    ImageButton gmailButton;
-    ImageButton outlookButton;
-    ImageButton yahooButton;
-    ImageButton aolButton;
-    ImageButton zohoButton;
-    Toolbar dashBoardToolbar;
-    ActionBar dashBoardActionBar;
-    Map<String, Boolean> checkedMap;
-    String query;
-    String instagramAuthString;
-    FrameLayout previewContainer;
-    FrameLayout parentLayout;
-    EditText dashSearchEditText;
-    TextView webSearchButton;
-    TextView imageSearchButton;
-    TextView videoSearchButton;
-    TextView memeSearchButton;
-    boolean isKeyboardOpen;
+    private GoogleApiClient client;
+    private FrameLayout previewContainer, parentLayout, previewContainerFrame;
+    private LinearLayout searchOptionBar, menuHamburgerLayout;
+    private SwipeRefreshLayout swipeRefreshContainer;
+    private RelativeLayout giphyPowerByLayout;
+    private ImageButton snapchatButton, twitterButton, pinterestButton, linkedinButton, youtubeButton, instagramButton, facebookButton;
+    private ImageButton gmailButton, outlookButton, yahooButton, aolButton, zohoButton;
+    private EditText dashSearchEditText;
+    private TextView webSearchButton, imageSearchButton, videoSearchButton, memeSearchButton;
+    private float startX, dx;
+    private DashBoardRVAdapter dashBoardRVAdapter;
+    private RecyclerView dashBoardRecyclerView;
+    private List<List<Object>> newsFeedObjectLists = new ArrayList<>();
+    private List<Object> searchItemList = new ArrayList<>();
+    private Dialog settingDialog;
+    private String currentQuery, selectedUrl, query;
+    private boolean isKeyboardOpen;
     private boolean isSearchMode = false;
     private boolean isSettingInit = false;
     private boolean isPreviewOpen = false;
     private boolean isPreviewEnabled = true; //save to preferences
-    float startX;
-    FrameLayout previewContainerFrame;
-    LinearLayout searchOptionBar;
-    DashBoardRVAdapter dashBoardRVAdapter;
-    List<List<Object>> newsFeedObjectLists = new ArrayList<>();
-    ArrayList<Object> socialMediaItemList = new ArrayList<>();
-    List<Object> searchItemList = new ArrayList<>();
-    SwipeRefreshLayout swipeRefreshContainer;
-    LinearLayout menuHamburgerLayout;
-    Dialog settingDialog;
-    private static final int viewSize = 66;    private static final int boundary = 35;
-    private float dx;
-    private int width;
-    private String currentQuery;
-    private String selectedUrl;
-    RelativeLayout giphyPowerByLayout;
-    private PDKResponse myPinsResponse;
-    private boolean loading = false;
-    private static final String PIN_FIELDS = "id,link,creator,image,counts,note,created_at,board,metadata";
-    private static final String FB_PERMISSIONS = "id,name,link,icon,message,created_time,description,picture,story,permalink_url,from, full_picture";
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,11 +146,6 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.menu_logo_iv:
                 startShareAppIntent();
-//                newsFeedObjectLists.clear();
-////                displayNewsFeed();
-////                swipeRefreshContainer.setEnabled(true);
-//                searchOptionBar.setVisibility(View.GONE);
-//                isSearchMode = false;
                 break;
             case R.id.menu_login_tv:
                 Intent loginIntent = new Intent(this, LoginActivity.class);
@@ -195,79 +161,40 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
             case R.id.preview_container_cover:
                 previewContainerFrame.setVisibility(View.GONE);
                 isPreviewOpen = false;
-                Intent intent = new Intent(DashBoardNewActivity.this, WebViewActivity.class);
-                intent.putExtra(Constants.URL_INTENTKEY, selectedUrl);
-                startActivity(intent);
+                openWebActivity(selectedUrl,"Search");
                 break;
             case R.id.search_option_web:
-                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
-                webSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                webSearchButton.setTypeface(null,Typeface.BOLD);
-                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                imageSearchButton.setTypeface(Typeface.DEFAULT);
-                imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                videoSearchButton.setTypeface(Typeface.DEFAULT);
-                videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                memeSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                memeSearchButton.setTypeface(Typeface.DEFAULT);
-                memeSearchButton.setPaintFlags(memeSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                turnSearchOptionOn(webSearchButton);
+                turnSearchOptionOff(imageSearchButton);
+                turnSearchOptionOff(videoSearchButton);
+                turnSearchOptionOff(memeSearchButton);
                 searchItemList.clear();
                 if (currentQuery!= null) makeBingApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_image:
                 parentLayout.requestFocus();
-                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
-                imageSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                imageSearchButton.setTypeface(null,Typeface.BOLD);
-                imageSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                webSearchButton.setTypeface(Typeface.DEFAULT);
-                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                videoSearchButton.setTypeface(Typeface.DEFAULT);
-                videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                memeSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                memeSearchButton.setTypeface(Typeface.DEFAULT);
-                memeSearchButton.setPaintFlags(memeSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                turnSearchOptionOn(imageSearchButton);
+                turnSearchOptionOff(webSearchButton);
+                turnSearchOptionOff(videoSearchButton);
+                turnSearchOptionOff(memeSearchButton);
                 if (currentQuery!=null)makeBingImageApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_video:
-                if (giphyPowerByLayout.getVisibility()==View.VISIBLE)giphyPowerByLayout.setVisibility(View.GONE);
-                videoSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                videoSearchButton.setTypeface(null,Typeface.BOLD);
-                videoSearchButton.setPaintFlags(webSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                imageSearchButton.setTypeface(Typeface.DEFAULT);
-                imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                webSearchButton.setTypeface(Typeface.DEFAULT);
-                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                memeSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                memeSearchButton.setTypeface(Typeface.DEFAULT);
-                memeSearchButton.setPaintFlags(memeSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                turnSearchOptionOn(videoSearchButton);
+                turnSearchOptionOff(imageSearchButton);
+                turnSearchOptionOff(webSearchButton);
+                turnSearchOptionOff(memeSearchButton);
                 if (currentQuery!=null)makeBingVideoApiCall(currentQuery, 0);
                 break;
             case R.id.search_option_gif:
-                memeSearchButton.setTextColor(getResources().getColor(R.color.colorPrimary));
-                memeSearchButton.setTypeface(null,Typeface.BOLD);
-                memeSearchButton.setPaintFlags(memeSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                imageSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                imageSearchButton.setTypeface(Typeface.DEFAULT);
-                imageSearchButton.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                webSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                webSearchButton.setTypeface(Typeface.DEFAULT);
-                webSearchButton.setPaintFlags(webSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
-                videoSearchButton.setTextColor(getResources().getColor(R.color.lightgray));
-                videoSearchButton.setTypeface(Typeface.DEFAULT);
-                videoSearchButton.setPaintFlags(videoSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
+                turnSearchOptionOn(memeSearchButton);
+                turnSearchOptionOff(imageSearchButton);
+                turnSearchOptionOff(webSearchButton);
+                turnSearchOptionOff(videoSearchButton);
                 if (currentQuery!=null)makeGiphyApiCall(currentQuery, 0);
-                giphyPowerByLayout.setVisibility(View.VISIBLE);
                 break;
             case R.id.settings_preview_switch:
                 isPreviewEnabled = !isPreviewEnabled;
-                Log.i(TAG, "onClick: is Preview Enabled " + isPreviewEnabled);
                 break;
             case R.id.settings_save_button:
                 settingDialog.cancel();
@@ -303,16 +230,10 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
                 openWebActivity(Constants.ZOHO_HOME_URL, "ZOHO Mail");
                 break;
 //            case R.id.dash_pinterest_button:
-//                Intent pinterestIntent = new Intent(DashBoardNewActivity.this, WebViewActivity.class);
-//                pinterestIntent.putExtra(Constants.URL_INTENTKEY, Constants.PINTEREST_HOME_URL);
-//                pinterestIntent.putExtra(Constants.TITLE_INTENTKEY, "Pinterest");
-//                startActivity(pinterestIntent);
+//                openWebActivity(Constants.PINTEREST_HOME_URL, "Pinterest");
 //                break;
 //            case R.id.dash_snapchat_button:
-//                Intent snapchatIntent = new Intent(DashBoardNewActivity.this, WebViewActivity.class);
-//                snapchatIntent.putExtra(Constants.URL_INTENTKEY, Constants.SNAPCHAT_HOME_URL);
-//                snapchatIntent.putExtra(Constants.TITLE_INTENTKEY, "SnapChat");
-//                startActivity(snapchatIntent);
+//                openWebActivity(Constants.SNAPCHAT_HOME_URL, "Snapchat");
 //                break;
         }
     }
@@ -331,19 +252,14 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         }
         else {
             previewContainer.setVisibility(View.GONE);
-            Intent intent = new Intent(DashBoardNewActivity.this, WebViewActivity.class);
-            intent.putExtra(Constants.URL_INTENTKEY, cardUrl);
-            startActivity(intent);
+            openWebActivity(cardUrl,"Search");
         }
-//        handleFlickableDialog(cardUrl);
     }
 
     @Override
     public void onPreviewClicked(String url) {
         previewContainer.setVisibility(View.GONE);
-        Intent intent = new Intent(DashBoardNewActivity.this, WebViewActivity.class);
-        intent.putExtra(Constants.URL_INTENTKEY, url);
-        startActivity(intent);
+        openWebActivity(url,"Search");
     }
 
     @Override
@@ -421,19 +337,9 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         }
     }
 
-    /**
-     * Coverts the input dp and returns px
-     * @param dp
-     * @return
-     */
-    private float convertDpToPx(int dp){
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getBaseContext().getResources().getDisplayMetrics());
-    }
-
     private void initViews() {
         parentLayout = (FrameLayout) findViewById(R.id.activity_dash_board);
         dashBoardRecyclerView = (RecyclerView) findViewById(R.id.dashbard_recyclerView);
-        dashBoardToolbar = (Toolbar) findViewById(R.id.dashboard_toolbar);
         previewContainer = (FrameLayout) findViewById(R.id.preview_container);
         facebookButton = (ImageButton) findViewById(R.id.dash_facebook_button);
         twitterButton = (ImageButton) findViewById(R.id.dash_twitter_button);
@@ -799,6 +705,20 @@ public class DashBoardNewActivity extends AppCompatActivity implements View.OnCl
         i.putExtra(Intent.EXTRA_SUBJECT, "Hey! Get Getsterr!");
         i.putExtra(Intent.EXTRA_TEXT, "Hey! Get Getsterr! \nhttps://play.google.com/store/apps/details?id=getsterr.imf&ah=02E7Fv-xKVeD-_tcwnyRMeEnxfc");
         startActivity(Intent.createChooser(i, "Share via"));
+    }
+
+    private void turnSearchOptionOn(TextView tv){
+        tv.setTextColor(getResources().getColor(R.color.colorPrimary));
+        tv.setTypeface(null,Typeface.BOLD);
+        tv.setPaintFlags(memeSearchButton.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        if (tv == memeSearchButton) giphyPowerByLayout.setVisibility(View.VISIBLE);
+        else giphyPowerByLayout.setVisibility(View.GONE);
+    }
+
+    private void turnSearchOptionOff(TextView tv){
+        tv.setTextColor(getResources().getColor(R.color.lightgray));
+        tv.setTypeface(Typeface.DEFAULT);
+        tv.setPaintFlags(imageSearchButton.getPaintFlags() & (~ Paint.UNDERLINE_TEXT_FLAG));
     }
 
     private void hideKeyboard() {
