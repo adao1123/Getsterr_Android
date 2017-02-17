@@ -80,5 +80,6 @@ public class Constants {
     public static final String BING_VIDEO_API_URL = "https://api.cognitive.microsoft.com/bing/v5.0/videos/";
 
     public static final String GIPHY_BASE_URL = "http://api.giphy.com";
+    public static final String GIPHY_API_KEY = "3o7TKKJUEanD8KNTHy";
 
 }
